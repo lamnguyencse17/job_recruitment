@@ -1,0 +1,29 @@
+{
+  "name": "job_recruitment",
+  "version": "1.0.0",
+  "description": "job_recruitment",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index",
+    "dev": "nodemon index"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lamnguyencse17/job_recruitment.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lamnguyencse17/job_recruitment/issues"
+  },
+  "homepage": "https://github.com/lamnguyencse17/job_recruitment#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^3.4.1",
+    "mongoose": "^5.8.7",
+    "nodemon": "^2.0.2"
+  }
+}
