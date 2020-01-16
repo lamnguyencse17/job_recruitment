@@ -18,23 +18,23 @@ router.post('/', async (req, res) => {
         if (err) {
             console.log(err);
         } else {
-            var db = await client.db('job_recruitment').collection('auths');
-            let info = await db.find({ "username": username }).toArray()
+            var db = await client.db('job_recruitment').collection('profiles');
+            let info = await db.find({ "auth.username": username }).toArray()
             if (info.length != 0) {
                 res.status(400).json({ message: "Username existed" })
             }
             else {
-                db = await client.db('job_recruitment').collection('auths');
-                info = await db.insertOne({ username: username, password: password, token: "token" })
+                db = await client.db('job_recruitment').collection('profiles');
+                info = await db.insertOne({"auth": {username: username, password: password, token: "token"} })
                 var token = jwt.sign({id: info.ops[0]._id}, config.secret, {
                     expiresIn: 86400 // 24 hours
                 });
-                update = await db.update({_id: info.ops[0]._id},{
+                db.update({_id: info.ops[0]._id},{
                     $set: {
-                        token: token
+                        "auth.token": token
                     }
                 })
-                res.status(200).json({ id: info.ops[0]._id, token: token }) // Clearly it will only return 1
+                return res.status(200).json({ id: info.ops[0]._id, token: token }) // Clearly it will only return 1
             }
         }
     });

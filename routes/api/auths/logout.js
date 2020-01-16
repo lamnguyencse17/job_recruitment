@@ -14,7 +14,7 @@ router.post('/', (req, res) => {
                 if (err) {
                     console.log(err);
                 } else {
-                    var db = await client.db('job_recruitment').collection('auths');
+                    var db = await client.db('job_recruitment').collection('profiles');
                     let info = await db.find({ "_id": ObjectId(decoded.id)  }).toArray()
                     if (info.length == 0) {
                         return res.status(400).json({ message: "Token verification failed" })
@@ -23,7 +23,7 @@ router.post('/', (req, res) => {
                         if (token == info[0].token) {
                             db.update({_id: ObjectId(decoded.id)}, {
                                 $set: {
-                                    token: ""
+                                    "auth.token": ""
                                 }
                             })
                             return res.status(200).json({message: "Logged out"})
