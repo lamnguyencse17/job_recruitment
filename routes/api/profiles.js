@@ -37,9 +37,9 @@ router.post("/", (req, res) => {
             } else {
                 db.updateOne({ _id: ObjectId(id) }, {
                     $set: {
-                        "name": name,
-                        "email": email,
-                        "dob": date
+                        "name": name ? name : info[0].name,
+                        "email": email ? email : info[0].email,
+                        "dob": date ? date : info[0].date
                     }
                 })
             }
@@ -79,6 +79,7 @@ router.put("/", (req, res) => {
         }
     })
 })
+
 router.delete("/", (req, res) => {
     let id = req.body.id;
     var token = req.headers['x-access-token'];
@@ -102,6 +103,7 @@ router.delete("/", (req, res) => {
                                         console.log(err);
                                     } else {
                                         var db = await client.db('job_recruitment').collection('profiles');
+                                        // eslint-disable-next-line no-unused-vars
                                         let remove = await db.deleteOne({ _id: ObjectId(req.body.id) })
                                         return res.status(200).json({ message: "Deleted" })
                                     }

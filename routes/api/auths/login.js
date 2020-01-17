@@ -24,7 +24,7 @@ router.post('/', async (req, res) => {
                 res.status(400).json({ message: "Username does not exist" })
             } else {
                 if (bcrypt.compareSync(password, info[0].auth.password)) {
-                    var token = jwt.sign({ id: info[0]._id }, config.secret, {
+                    var token = jwt.sign({ id: info[0]._id, role: info[0].role }, config.secret, {
                         expiresIn: 86400 // 24 hours
                     });
                     // eslint-disable-next-line no-unused-vars
