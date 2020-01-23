@@ -17,7 +17,7 @@ router.post('/', async (req, res) => {
     let role = req.body.role; // 1: normal user, 2: recruiter
     let password = bcrypt.hashSync(req.body.password, 8);
     let companyID = req.body.companyID
-    mongo.connect('mongodb://localhost:27017/job_recruitment', async (err, client) => {
+    mongo.connect('mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority', async (err, client) => {
         if (err) {
             console.log(err);
         } else {

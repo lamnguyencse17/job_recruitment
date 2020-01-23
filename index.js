@@ -11,6 +11,7 @@ app.use('/api/auths/verify', require('./routes/api/auths/verify'))
 app.use('/api/auths/logout', require('./routes/api/auths/logout'))
 app.use('/api/profiles', require('./routes/api/profiles'))
 app.use('/api/jobs', require('./routes/api/jobs'))
+app.use('/api/companies', require('./routes/api/companies'))
 
 const PORT = process.env.PORT || 5000;
 

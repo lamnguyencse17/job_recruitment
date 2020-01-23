@@ -14,7 +14,7 @@ router.get('/', (req, res) => {
 router.post('/', async (req, res) => {
     var username = req.body.username;
     var password = req.body.password;
-    mongo.connect('mongodb://localhost:27017/job_recruitment', async (err, client) => {
+    mongo.connect('mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority', async (err, client) => {
         if (err) {
             console.log(err);
         } else {

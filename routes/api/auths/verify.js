@@ -10,7 +10,7 @@ router.get('/', (req, res) => {
     if (!token) return res.status(401).send({ message: "No token provided." });
     jwt.verify(token, config.secret, (err, decoded) => {
         if (err) { return status(500).send({ message: 'Failed to authenticate token.' }) } else {
-            mongo.connect('mongodb://localhost:27017/job_recruitment', async (err, client) => {
+            mongo.connect('mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority', async (err, client) => {
                 if (err) {
                     console.log(err);
                 } else {

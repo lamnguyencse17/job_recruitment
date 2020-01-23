@@ -8,7 +8,7 @@ const config = require('../../env/config')
 
 router.get("/", (req, res) => {
     let id = req.body.id
-    mongo.connect('mongodb://localhost:27017/job_recruitment', async (err, client) => {
+    mongo.connect('mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority', async (err, client) => {
         if (err) {
             console.log(err);
         } else {
@@ -26,7 +26,7 @@ router.post("/", (req, res) => {
     let dob = req.body.dob
     let email = req.body.email
     let date = new Date(Date.UTC(parseInt(dob.year), parseInt(dob.month), parseInt(dob.date), 0, 0, 0)) //not working somehow?
-    mongo.connect('mongodb://localhost:27017/job_recruitment', async (err, client) => {
+    mongo.connect('mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority', async (err, client) => {
         if (err) {
             console.log(err);
         } else {
@@ -56,7 +56,7 @@ router.put("/", (req, res) => {
     let email = req.body.email
     if (dob) {
         var date = new Date(Date.UTC(parseInt(dob.year), parseInt(dob.month), parseInt(dob.date), 0, 0, 0)) //not working somehow?
-    } mongo.connect('mongodb://localhost:27017/job_recruitment', async (err, client) => {
+    } mongo.connect('mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority', async (err, client) => {
         if (err) {
             console.log(err);
         } else {
@@ -86,7 +86,7 @@ router.delete("/", (req, res) => {
     if (!token) return res.status(401).send({ message: "No token provided." });
     jwt.verify(token, config.secret, (err, decoded) => {
         if (err) { return status(500).send({ message: 'Failed to authenticate token.' }) } else {
-            mongo.connect('mongodb://localhost:27017/job_recruitment', async (err, client) => {
+            mongo.connect('mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority', async (err, client) => {
                 if (err) {
                     console.log(err);
                 } else {
@@ -98,7 +98,7 @@ router.delete("/", (req, res) => {
                     else {
                         if (token == info[0].auth.token) {
                             if (decoded.id == id) {
-                                mongo.connect('mongodb://localhost:27017/job_recruitment', async (err, client) => {
+                                mongo.connect('mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority', async (err, client) => {
                                     if (err) {
                                         console.log(err);
                                     } else {
