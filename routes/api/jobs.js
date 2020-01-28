@@ -144,7 +144,8 @@ async function postJobs(client, id, detail) {
             "description": detail.description,
             "employees": detail.employees,
             "date": detail.date,
-            "companyID": ObjectId(id)
+            "companyID": ObjectId(id),
+            "cvs": []
         })
         info = info.ops[0]
         client.db('job_recruitment').collection('companies').findOneAndUpdate({ "_id": ObjectId(id) }, {

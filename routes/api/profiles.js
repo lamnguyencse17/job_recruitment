@@ -38,13 +38,20 @@ router.post("/", (req, res) => {
             } else {
                 db.updateOne({ _id: ObjectId(id) }, {
                     $set: {
-                        "name": name ? name : info[0].name,
-                        "email": email ? email : info[0].email,
-                        "dob": date ? date : info[0].date
+                        "name": name,
+                        "email": email,
+                        "dob": date,
                     }
                 })
             }
             info = await db.find({ "_id": ObjectId(id) }).toArray()
+            if (info[0].role == 1) {
+                db.updateOne({ _id: ObjectId(id) }, {
+                    $set: {
+                        "cvs": []
+                    }
+                })
+            }
             delete info[0].auth
             return res.status(200).json(info[0])
         }
@@ -112,7 +119,7 @@ router.delete("/", (req, res) => {
                             } else {
                                 return res.status(400).json({ message: "Mismatch between token, login, and database" })
                             }
-                            
+
                         }
                         else {
                             return res.status(400).json({ message: "Expired token" })

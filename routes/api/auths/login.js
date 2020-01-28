@@ -21,7 +21,7 @@ router.post('/', async (req, res) => {
             console.log(err);
         } else {
             var db = await client.db('job_recruitment').collection('profiles');
-            let info = await db.find({"auth.username": username }).toArray() // Clearly it will only return 1
+            let info = await db.find({ "auth.username": username }).toArray() // Clearly it will only return 1
             if (info.length == 0) {
                 res.status(400).json({ message: "Username does not exist" })
             } else {
@@ -31,7 +31,7 @@ router.post('/', async (req, res) => {
                     });
                     // eslint-disable-next-line no-unused-vars
                     let update = await db.updateOne({ _id: info[0]._id }, {
-                        $set:  {
+                        $set: {
                             "auth.token": token
                         }
                     })
