@@ -10,7 +10,12 @@ router.get('/', (req, res) => {
         if (err) {
             return res.status(400).json({ message: err })
         } else {
-            let result = await getCompanies(client, req.body.id)
+            let result;
+            if (req.body.id != -1) {
+                result = await getCompanies(client, req.body.id)
+            } else {
+                result = await getAllCompanies(client, req.body.page)
+            }
             return res.status(result.code).json(result.message ? result.message : result.info)
         }
     })
@@ -67,11 +72,11 @@ router.delete("/", async (req, res) => {
                                         return res.status(400).json({ message: "Company ID does not exits" })
                                     } else {
                                         // if ((info[0].recruiters).includes(decoded.id)) { //something when wrong here
-                                            // eslint-disable-next-line no-unused-vars
-                                            let removeCompany = await db.deleteOne({ _id: ObjectId(company_id) })
-                                            // eslint-disable-next-line no-unused-vars
-                                            let removeJobs = await client.db('job_recruitment').collection('jobs').deleteMany({ companyID: ObjectId(company_id) })
-                                            return res.status(200).json({ message: "Deleted" })
+                                        // eslint-disable-next-line no-unused-vars
+                                        let removeCompany = await db.deleteOne({ _id: ObjectId(company_id) })
+                                        // eslint-disable-next-line no-unused-vars
+                                        let removeJobs = await client.db('job_recruitment').collection('jobs').deleteMany({ companyID: ObjectId(company_id) })
+                                        return res.status(200).json({ message: "Deleted" })
                                         // }
                                         // else {
                                         //     return res.status(400).json({ message: "No permission to delete" })
@@ -92,6 +97,14 @@ router.delete("/", async (req, res) => {
 
 
 // Helper Functions
+async function getAllCompanies(client, page) { // page is to make sure that we're sending the right N-th stuff (page1: first 10, page2: second 10)
+    let info = await client.db('job_recruitment').collection("companies").find({
+        $query: {},
+        $orderby: { $natural: -1 }
+    }).limit(page * 10).toArray()
+    return { code: 200, info: info }
+}
+
 async function getCompanies(client, id) {
     if (!ObjectId.isValid(id)) {
         return { code: 400, message: "Invalid company ID" }

@@ -4,6 +4,8 @@ const mongo = require('mongodb').MongoClient
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const config = require('../../../env/config')
+const authLog = require('../../../logging/modules/authLog')
+
 
 
 
@@ -33,6 +35,8 @@ router.post('/', async (req, res) => {
                             "auth.token": token
                         }
                     })
+                    let path = './logging/logs/auth'
+                    authLog.writeLog(info[0]._id, path)
                     return res.status(200).json({ id: info[0]._id, token: token })
                 }
                 else {

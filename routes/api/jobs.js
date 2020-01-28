@@ -11,7 +11,13 @@ router.get("/", async (req, res) => {
         if (err) {
             return res.status(400).json({ message: err })
         } else {
-            let result = await getJobs(client, req.body.id)
+            let result
+            if (req.body.id != -1) {
+                result = await getJobs(client, req.body.id)
+            }
+            else {
+                result = await getAllJobs(client, req.body.page)
+            }
             return res.status(result.code).json(result.message ? result.message : result.info)
         }
     })
@@ -54,7 +60,7 @@ router.delete("/", async (req, res) => {
                     if (info.length == 0) {
                         return res.status(400).json({ message: "Token verification failed" })
                     }
-                    if (decoded.role == 1){
+                    if (decoded.role == 1) {
                         return res.status(400).json({ message: "No permission to delete" })
                     }
                     else {
@@ -67,7 +73,7 @@ router.delete("/", async (req, res) => {
                                     info = await db.find({ "_id": ObjectId(job_id) }).toArray()
                                     // eslint-disable-next-line no-unused-vars
                                     let remove = await db.deleteOne({ _id: ObjectId(job_id) })
-                                    client.db('job_recruitment').collection('companies').findOneAndUpdate({"_id": info[0].companyID}, {
+                                    client.db('job_recruitment').collection('companies').findOneAndUpdate({ "_id": info[0].companyID }, {
                                         $pull: {
                                             jobs: ObjectId(job_id)
                                         }
@@ -87,6 +93,14 @@ router.delete("/", async (req, res) => {
 })
 
 //Helper functions
+async function getAllCompanies(client, page) { // page is to make sure that we're sending the right N-th stuff (page1: first 10, page2: second 10)
+    let info = await client.db('job_recruitment').collection("jobs").find({
+        $query: {},
+        $orderby: { $natural: -1 }
+    }).limit(page * 10).toArray()
+    return { code: 200, info: info }
+}
+
 async function getJobs(client, id) {
     if (!ObjectId.isValid(id)) {
         return { code: 400, message: "Invalid Job ID" }
