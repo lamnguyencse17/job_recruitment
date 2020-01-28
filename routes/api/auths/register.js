@@ -5,6 +5,8 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const config = require('../../../env/config')
 const ObjectId = require('mongodb').ObjectId
+const authLog = require('../../../logging/modules/authLog')
+const dataPath = 'mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority'
 
 
 
@@ -17,7 +19,7 @@ router.post('/', async (req, res) => {
     let role = req.body.role; // 1: normal user, 2: recruiter
     let password = bcrypt.hashSync(req.body.password, 8);
     let companyID = req.body.companyID
-    mongo.connect('mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority', async (err, client) => {
+    mongo.connect(dataPath, async (err, client) => {
         if (err) {
             console.log(err);
         } else {
@@ -59,6 +61,8 @@ router.post('/', async (req, res) => {
                         }
                     })
                 }
+                let path = './logging/logs/auth'
+                authLog.writeLog(info.ops[0]._id, path)
                 return res.status(200).json({ id: info.ops[0]._id, token: token }) // Clearly it will only return 1
             }
         }

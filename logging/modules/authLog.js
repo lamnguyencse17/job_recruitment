@@ -23,7 +23,10 @@ async function readLog(id, path) {
     let files = fs.readdirSync(path)
     files.map(file => {
         if (file.includes('.log')){
-            records = records.concat(fs.readFileSync(`${path}/${file}`,'utf8').replace('\r','').split('\n'))
+            let day = {}
+            day[file.replace('.log', '')] = fs.readFileSync(`${path}/${file}`,'utf8').replace('\r','').split('\n')
+            console.log(day)
+            records = records.concat(day)
         }
     })
     return records

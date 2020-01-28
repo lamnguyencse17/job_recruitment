@@ -5,7 +5,7 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const config = require('../../../env/config')
 const authLog = require('../../../logging/modules/authLog')
-
+const dataPath = 'mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority'
 
 
 
@@ -16,7 +16,7 @@ router.get('/', (req, res) => {
 router.post('/', async (req, res) => {
     var username = req.body.username;
     var password = req.body.password;
-    mongo.connect('mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority', async (err, client) => {
+    mongo.connect(dataPath, async (err, client) => {
         if (err) {
             console.log(err);
         } else {
@@ -30,13 +30,13 @@ router.post('/', async (req, res) => {
                         expiresIn: 86400 // 24 hours
                     });
                     // eslint-disable-next-line no-unused-vars
-                    let update = await db.update({ _id: info[0]._id }, {
+                    let update = await db.updateOne({ _id: info[0]._id }, {
                         $set:  {
                             "auth.token": token
                         }
                     })
                     let path = './logging/logs/auth'
-                    authLog.writeLog(info[0]._id, path)
+                    authLog.readLog(info[0]._id, path)
                     return res.status(200).json({ id: info[0]._id, token: token })
                 }
                 else {

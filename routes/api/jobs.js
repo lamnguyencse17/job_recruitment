@@ -4,10 +4,11 @@ const mongo = require('mongodb').MongoClient
 const ObjectId = require('mongodb').ObjectId
 const jwt = require('jsonwebtoken')
 const config = require('../../env/config')
+const dataPath = 'mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority'
 
 
 router.get("/", async (req, res) => {
-    mongo.connect('mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority', async (err, client) => {
+    mongo.connect(dataPath, async (err, client) => {
         if (err) {
             return res.status(400).json({ message: err })
         } else {
@@ -24,7 +25,7 @@ router.get("/", async (req, res) => {
 })
 
 router.post("/", async (req, res) => {
-    mongo.connect('mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority', async (err, client) => {
+    mongo.connect(dataPath, async (err, client) => {
         if (err) {
             return res.status(400).json({ message: err })
         } else {
@@ -35,7 +36,7 @@ router.post("/", async (req, res) => {
 })
 
 router.put("/", async (req, res) => {
-    mongo.connect('mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority', async (err, client) => {
+    mongo.connect(dataPath, async (err, client) => {
         if (err) {
             return res.status(400).json({ message: err })
         } else {
@@ -51,7 +52,7 @@ router.delete("/", async (req, res) => {
     if (!token) return res.status(401).send({ message: "No token provided." });
     jwt.verify(token, config.secret, (err, decoded) => {
         if (err) { return status(500).send({ message: 'Failed to authenticate token.' }) } else {
-            mongo.connect('mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority', async (err, client) => {
+            mongo.connect(dataPath, async (err, client) => {
                 if (err) {
                     console.log(err);
                 } else {
@@ -65,7 +66,7 @@ router.delete("/", async (req, res) => {
                     }
                     else {
                         if (token == info[0].auth.token) {
-                            mongo.connect('mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority', async (err, client) => {
+                            mongo.connect(dataPath, async (err, client) => {
                                 if (err) {
                                     console.log(err);
                                 } else {
@@ -93,7 +94,7 @@ router.delete("/", async (req, res) => {
 })
 
 //Helper functions
-async function getAllCompanies(client, page) { // page is to make sure that we're sending the right N-th stuff (page1: first 10, page2: second 10)
+async function getAllJobs(client, page) { // page is to make sure that we're sending the right N-th stuff (page1: first 10, page2: second 10)
     let info = await client.db('job_recruitment').collection("jobs").find({
         $query: {},
         $orderby: { $natural: -1 }
