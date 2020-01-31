@@ -1,7 +1,13 @@
 const express = require('express')
 const bodyParser = require('body-parser')
+const helmet = require('helmet')
+const cors = require('cors')
+const morgan = require('morgan')
 
 const app = express();
+app.use(cors())
+app.use(helmet())
+app.use(morgan('combined'))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -12,6 +18,7 @@ app.use('/api/auths/logout', require('./routes/api/auths/logout'))
 app.use('/api/profiles', require('./routes/api/profiles'))
 app.use('/api/jobs', require('./routes/api/jobs'))
 app.use('/api/companies', require('./routes/api/companies'))
+app.use('/api/cvs', require('./routes/api/cvs'))
 
 const PORT = process.env.PORT || 5000;
 
