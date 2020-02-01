@@ -4,6 +4,8 @@ const helmet = require('helmet')
 const cors = require('cors')
 const morgan = require('morgan')
 const compression = require('compression')
+const redis = require('./middlewares/redis')
+const verify = require('./middlewares/verify')
 
 const app = express();
 app.use(cors())
@@ -12,6 +14,8 @@ app.use(compression())
 app.use(morgan('combined'))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(verify())
+app.use(redis())
 
 app.use('/api/auths/login', require('./routes/api/auths/login'))
 app.use('/api/auths/register', require('./routes/api/auths/register'))

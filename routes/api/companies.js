@@ -2,21 +2,42 @@ const express = require('express')
 const router = express.Router();
 const mongo = require('mongodb').MongoClient
 const ObjectId = require('mongodb').ObjectId
-const jwt = require('jsonwebtoken')
-const config = require('../../env/config')
+const redis = require('redis')
 const dataPath = 'mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority'
+const redis_client = redis.createClient(17054, "redis-17054.c53.west-us.azure.cloud.redislabs.com");
+
+redis_client.auth('zodiac3011', (err) => {
+    if (err) {
+        console.log(err)
+    }
+})
 
 router.get('/', (req, res) => {
     mongo.connect(dataPath, async (err, client) => {
         if (err) {
             return res.status(400).json({ message: err })
         } else {
-            let result;
-            if (req.body.id != -1) {
-                result = await getCompanies(client, req.body.id)
-            } else {
-                result = await getAllCompanies(client, req.body.page)
+            let result
+            if (req.cached) {
+                console.log("GETTING")
+                return res.status(200).json(JSON.parse(req.cached))
             }
+            else {
+                if (ObjectId.isValid(req.body.id)) {
+                    result = await getCompanies(client, req.body.id)
+                    if (!result.message) {
+                        console.log("CACHING")
+                        redis_client.setex(req.body.id, 3600, JSON.stringify(result.info))
+                    }
+                }
+                else {
+                    result = await getAllCompanies(client, req.body.page)
+
+                    console.log("CACHING")
+                    redis_client.setex(req.body.page, 3600, JSON.stringify(result.info))
+                }
+            }
+
             return res.status(result.code).json(result.message ? result.message : result.info)
         }
     })
@@ -45,55 +66,55 @@ router.put("/", async (req, res) => {
 
 router.delete("/", async (req, res) => {
     let company_id = req.body.company_id;
-    var token = req.headers['x-access-token'];
-    if (!token) return res.status(401).send({ message: "No token provided." });
-    jwt.verify(token, config.secret, (err, decoded) => {
-        if (err) { return status(500).send({ message: 'Failed to authenticate token.' }) } else {
-            mongo.connect(dataPath, async (err, client) => {
-                if (err) {
-                    console.log(err);
-                } else {
-                    var db = await client.db('job_recruitment').collection('profiles');
-                    let info = await db.find({ "_id": ObjectId(decoded.id) }).toArray()
-                    if (info.length == 0) {
-                        return res.status(400).json({ message: "Token verification failed" })
-                    }
-                    if (decoded.role == 1) {
-                        return res.status(400).json({ message: "No permission to delete" })
-                    }
-                    else {
-                        if (token == info[0].auth.token) {
-                            mongo.connect(dataPath, async (err, client) => {
-                                if (err) {
-                                    console.log(err);
+    if (!req.user) {
+        return res.status(401).send({ message: "No token provided." });
+    }
+    else {
+        mongo.connect(dataPath, async (err, client) => {
+            if (err) {
+                console.log(err);
+            } else {
+                var db = await client.db('job_recruitment').collection('profiles');
+                let info = await db.find({ "_id": ObjectId(req.user) }).toArray()
+                if (info.length == 0) {
+                    return res.status(400).json({ message: "Token verification failed" })
+                }
+                if (req.role == 1) {
+                    return res.status(400).json({ message: "No permission to delete" })
+                }
+                else {
+                    if (req.user == info[0]._id) {
+                        mongo.connect(dataPath, async (err, client) => {
+                            if (err) {
+                                console.log(err);
+                            } else {
+                                let db = await client.db('job_recruitment').collection('companies');
+                                info = await db.find({ "_id": ObjectId(company_id) }).toArray()
+                                if (info.length == 0) {
+                                    return res.status(400).json({ message: "Company ID does not exits" })
                                 } else {
-                                    let db = await client.db('job_recruitment').collection('companies');
-                                    info = await db.find({ "_id": ObjectId(company_id) }).toArray()
-                                    if (info.length == 0) {
-                                        return res.status(400).json({ message: "Company ID does not exits" })
-                                    } else {
-                                        // if ((info[0].recruiters).includes(decoded.id)) { //something when wrong here
+                                    if (info[0].recruiters.map(recruiter => {
+                                        recruiter == req.user
+                                    })) {
                                         // eslint-disable-next-line no-unused-vars
                                         let removeCompany = await db.deleteOne({ _id: ObjectId(company_id) })
                                         // eslint-disable-next-line no-unused-vars
                                         let removeJobs = await client.db('job_recruitment').collection('jobs').deleteMany({ companyID: ObjectId(company_id) })
                                         return res.status(200).json({ message: "Deleted" })
-                                        // }
-                                        // else {
-                                        //     return res.status(400).json({ message: "No permission to delete" })
-                                        // }
+                                    } else {
+                                        return res.status(400).json({ message: "No permission to delete" })
                                     }
                                 }
-                            })
-                        }
-                        else {
-                            return res.status(400).json({ message: "Expired token" })
-                        }
+                            }
+                        })
+                    }
+                    else {
+                        return res.status(400).json({ message: "Expired token" })
                     }
                 }
-            })
-        }
-    })
+            }
+        })
+    }
 })
 
 
@@ -103,6 +124,10 @@ async function getAllCompanies(client, page) { // page is to make sure that we'r
         $query: {},
         $orderby: { $natural: -1 }
     }).limit(page * 10).toArray()
+    info.map(field => {
+        delete field.recruiters
+        delete field.cvs
+    })
     return { code: 200, info: info }
 }
 
@@ -129,7 +154,9 @@ async function getCompanies(client, id) {
         delete info[0].recruiters;
         info[0].jobs.map(job => {
             delete job.companyID
+            delete job.cvs
         })
+        delete info[0].recruiters
         return { code: 200, info: info[0] }
     }
 }
@@ -182,5 +209,6 @@ async function putCompanies(client, id, detail) {
         }
     }
 }
+
 
 module.exports = router;

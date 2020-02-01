@@ -2,8 +2,6 @@ const express = require('express')
 const router = express.Router();
 const mongo = require('mongodb').MongoClient
 const ObjectId = require('mongodb').ObjectId
-const jwt = require('jsonwebtoken')
-const config = require('../../env/config')
 const multer = require('multer')
 const fs = require('fs');
 
@@ -11,11 +9,9 @@ const dataPath = 'mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure
 
 const storage = multer.diskStorage({
     destination: async function (req, file, callback) {
-        let id = req.body.profile_ID
-        let token = req.headers['x-access-token'];
+        let id = req.user
         let error = null
-        let auth = await verifyToken(token)
-        if (!auth.result || id != auth.id) {
+        if (!req.user) {
             error = "Can't verify token"
         } else {
             if (!fs.existsSync(`./uploads/${id}`)) {
@@ -32,9 +28,7 @@ const storage = multer.diskStorage({
 const proofUpload = multer({ storage: storage }).array('proof', 5);
 
 router.get('/', async (req, res) => {
-    let token = req.headers['x-access-token'];
-    let auth = await verifyToken(token)
-    if (!auth.result) {
+    if (!req.user) {
         return res.status(400).json({ message: "Can't verify token" })
     }
     else {
@@ -44,9 +38,9 @@ router.get('/', async (req, res) => {
             } else {
                 let result
                 if (req.body.CV_ID) {
-                    result = await getCVS(client, req.body.CV_ID, auth.id)
+                    result = await getCVS(client, req.body.CV_ID, req.user)
                 } else {
-                    if (req.body.profile_ID == auth.id) {
+                    if (req.body.profile_ID == req.user) {
                         result = await getAllCVS(client, req.body.profile_ID)
                     }
                     else {
@@ -79,15 +73,12 @@ router.post('/', async (req, res) => {
             })
         }
     })
-
 })
 
 router.delete('/', async (req, res) => {
     // body: profile_ID, CV_ID
-    let token = req.headers['x-access-token'];
-    let auth = await verifyToken(token)
-    if (!(auth || auth.id != req.body.profile_ID)) {
-        return res.status(400).json({message: "Not Authorized"})
+    if (!(req.user || req.user == req.body.profile_ID)) {
+        return res.status(400).json({ message: "Not Authorized" })
     } else {
         mongo.connect(dataPath, async (err, client) => {
             let result = await deleteCVS(client, req.body.CV_ID, req.body.profile_ID)
@@ -145,45 +136,27 @@ async function postCVS(client, profile_id, job_id, detail, proofPath) {
     return { code: 200, message: info }
 }
 
-async function deleteCVS(client, cv_id, profile_id){
+async function deleteCVS(client, cv_id, profile_id) {
     let result = await client.db('job_recruitment').collection('cvs').deleteOne({
         '_id': ObjectId(cv_id),
-         'profile_ID': ObjectId(profile_id)});
+        'profile_ID': ObjectId(profile_id)
+    });
     console.log(result)
-    if (result.deletedCount == 0){
-        return {code: 400, message: "Nothing to delete or Not authorized"}
+    if (result.deletedCount == 0) {
+        return { code: 400, message: "Nothing to delete or Not authorized" }
     } else {
-        client.db('job_recruitment').collection('profiles').findOneAndUpdate({'_id': ObjectId(profile_id)}, {
+        client.db('job_recruitment').collection('profiles').findOneAndUpdate({ '_id': ObjectId(profile_id) }, {
             $pull: {
                 cvs: ObjectId(cv_id)
             }
         })
-        client.db('job_recruitment').collection('jobs').findOneAndUpdate({ cvs: ObjectId(cv_id)}, {
+        client.db('job_recruitment').collection('jobs').findOneAndUpdate({ cvs: ObjectId(cv_id) }, {
             $pull: {
                 cvs: ObjectId(cv_id)
             }
         })
-        return {code: 200, message: `Deleted ${result.deletedCount} cv(s)`}
-    }   
-}
-
-async function verifyToken(token) {
-    return jwt.verify(token, config.secret, async (err, decoded) => {
-        let result = await mongo.connect(dataPath).then(async client => {
-            var db = await client.db('job_recruitment').collection('profiles');
-            let info = await db.find({ "_id": ObjectId(decoded.id) }).toArray()
-            if (info.length == 0) {
-                return false
-            } else {
-                if (token == info[0].auth.token) {
-                    return true
-                } else {
-                    return false
-                }
-            }
-        })
-        return { result: result, id: result ? decoded.id : null }
-    })
+        return { code: 200, message: `Deleted ${result.deletedCount} cv(s)` }
+    }
 }
 
 module.exports = router;

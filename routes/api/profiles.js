@@ -2,12 +2,11 @@ const express = require('express')
 const router = express.Router();
 const mongo = require('mongodb').MongoClient
 const ObjectId = require('mongodb').ObjectId
-const jwt = require('jsonwebtoken')
-const config = require('../../env/config')
 const dataPath = 'mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority'
 
 
-router.get("/", (req, res) => {
+router.get("/", (req, res) => { // access own or other profile
+    // TODOS: permission to view
     let id = req.body.id
     mongo.connect(dataPath, async (err, client) => {
         if (err) {
@@ -89,46 +88,44 @@ router.put("/", (req, res) => {
 })
 
 router.delete("/", (req, res) => {
-    let id = req.body.id;
-    var token = req.headers['x-access-token'];
-    if (!token) return res.status(401).send({ message: "No token provided." });
-    jwt.verify(token, config.secret, (err, decoded) => {
-        if (err) { return status(500).send({ message: 'Failed to authenticate token.' }) } else {
-            mongo.connect(dataPath, async (err, client) => {
-                if (err) {
-                    console.log(err);
-                } else {
-                    var db = await client.db('job_recruitment').collection('profiles');
-                    let info = await db.find({ "_id": ObjectId(decoded.id) }).toArray()
-                    if (info.length == 0) {
-                        return res.status(400).json({ message: "Token verification failed" })
+    // TODOS: Split to function
+    if (!req.user){
+        return res.status(401).send({ message: "No token provided." });
+    } else {
+        mongo.connect(dataPath, async (err, client) => {
+            if (err) {
+                console.log(err);
+            } else {
+                var db = await client.db('job_recruitment').collection('profiles');
+                let info = await db.find({ "_id": ObjectId(req.body.id) }).toArray()
+                if (info.length == 0) {
+                    return res.status(400).json({ message: "Token verification failed" })
+                }
+                else {
+                    if (req.user == info[0]._id) {
+                        if (req.user == req.body.id) {
+                            mongo.connect(dataPath, async (err, client) => {
+                                if (err) {
+                                    console.log(err);
+                                } else {
+                                    var db = await client.db('job_recruitment').collection('profiles');
+                                    // eslint-disable-next-line no-unused-vars
+                                    let remove = await db.deleteOne({ _id: ObjectId(req.body.id) })
+                                    return res.status(200).json({ message: "Deleted" })
+                                }
+                            })
+                        } else {
+                            return res.status(401).json({ message: "Mismatch between token, login, and database" })
+                        }
+
                     }
                     else {
-                        if (token == info[0].auth.token) {
-                            if (decoded.id == id) {
-                                mongo.connect(dataPath, async (err, client) => {
-                                    if (err) {
-                                        console.log(err);
-                                    } else {
-                                        var db = await client.db('job_recruitment').collection('profiles');
-                                        // eslint-disable-next-line no-unused-vars
-                                        let remove = await db.deleteOne({ _id: ObjectId(req.body.id) })
-                                        return res.status(200).json({ message: "Deleted" })
-                                    }
-                                })
-                            } else {
-                                return res.status(400).json({ message: "Mismatch between token, login, and database" })
-                            }
-
-                        }
-                        else {
-                            return res.status(400).json({ message: "Expired token" })
-                        }
+                        return res.status(400).json({ message: "Expired token" })
                     }
                 }
-            })
-        }
-    })
+            }
+        })
+    }
 })
 
 module.exports = router;

@@ -20,30 +20,27 @@ router.get("/", async (req, res) => {
             return res.status(400).json({ message: err })
         } else {
             let result
-            if (req.body.id != -1) {
-                result = await getJobs(client, req.body.id)
-
+            if (req.cached) {
+                console.log("GETTING")
+                return res.status(200).json(JSON.parse(req.cached))
             }
             else {
-                redis_client.get('AllJobs', async (err, reply) => {
-                    if (err) {
-                        return res.status(400).json(err)
+                if (req.body.id != -1) {
+                    result = await getJobs(client, req.body.id)
+                    if (!result.message) {
+                        console.log("CACHING")
+                        redis_client.setex(req.body.id, 3600, JSON.stringify(result.info))
                     }
-                    else {
-                        if (reply == null) {
-                            result = await getAllJobs(client, req.body.page)
-                            if (!result.message){
-                                console.log("CACHING")
-                                redis_client.setex("AllJobs", 3600, JSON.stringify(result.info))
-                            }
-                            return res.status(result.code).json(result.message ? result.message : result.info)
-                        } else {
-                            console.log("GETTING")
-                            return res.status(200).json(JSON.parse(reply))
-                        }
-                    }
-                })
+                }
+                else {
+                    result = await getAllJobs(client, req.body.page)
+
+                    console.log("CACHING")
+                    redis_client.setex("AllJobs", 3600, JSON.stringify(result.info))
+                }
             }
+
+            return res.status(result.code).json(result.message ? result.message : result.info)
         }
     })
 })
@@ -123,6 +120,9 @@ async function getAllJobs(client, page) { // page is to make sure that we're sen
         $query: {},
         $orderby: { $natural: -1 }
     }).limit(page * 10).toArray()
+    info.map(field => {
+        delete field.cvs
+    })
     return { code: 200, info: info }
 }
 
@@ -147,7 +147,9 @@ async function getJobs(client, id) {
         return { code: 400, message: "Job does not exist" }
     } else {
         delete info[0].companyID;
+        delete info[0].cvs;
         delete info[0].company[0].jobs
+        delete info[0].company[0].recuiters
         return { code: 200, info: info[0] }
     }
 }
