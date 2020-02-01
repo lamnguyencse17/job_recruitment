@@ -82,6 +82,20 @@ router.post('/', async (req, res) => {
 
 })
 
+router.delete('/', async (req, res) => {
+    // body: profile_ID, CV_ID
+    let token = req.headers['x-access-token'];
+    let auth = await verifyToken(token)
+    if (!(auth || auth.id != req.body.profile_ID)) {
+        return res.status(400).json({message: "Not Authorized"})
+    } else {
+        mongo.connect(dataPath, async (err, client) => {
+            let result = await deleteCVS(client, req.body.CV_ID, req.body.profile_ID)
+            return res.status(result.code).json(result.message ? result.message : result.info)
+        })
+    }
+})
+
 
 //Helper Functions
 async function getAllCVS(client, profile_id) { // get all cvs of profile_id
@@ -129,6 +143,28 @@ async function postCVS(client, profile_id, job_id, detail, proofPath) {
         }
     })
     return { code: 200, message: info }
+}
+
+async function deleteCVS(client, cv_id, profile_id){
+    let result = await client.db('job_recruitment').collection('cvs').deleteOne({
+        '_id': ObjectId(cv_id),
+         'profile_ID': ObjectId(profile_id)});
+    console.log(result)
+    if (result.deletedCount == 0){
+        return {code: 400, message: "Nothing to delete or Not authorized"}
+    } else {
+        client.db('job_recruitment').collection('profiles').findOneAndUpdate({'_id': ObjectId(profile_id)}, {
+            $pull: {
+                cvs: ObjectId(cv_id)
+            }
+        })
+        client.db('job_recruitment').collection('jobs').findOneAndUpdate({ cvs: ObjectId(cv_id)}, {
+            $pull: {
+                cvs: ObjectId(cv_id)
+            }
+        })
+        return {code: 200, message: `Deleted ${result.deletedCount} cv(s)`}
+    }   
 }
 
 async function verifyToken(token) {

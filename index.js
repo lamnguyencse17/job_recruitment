@@ -3,10 +3,12 @@ const bodyParser = require('body-parser')
 const helmet = require('helmet')
 const cors = require('cors')
 const morgan = require('morgan')
+const compression = require('compression')
 
 const app = express();
 app.use(cors())
 app.use(helmet())
+app.use(compression())
 app.use(morgan('combined'))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }));

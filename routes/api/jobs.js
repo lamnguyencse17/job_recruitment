@@ -3,9 +3,16 @@ const router = express.Router();
 const mongo = require('mongodb').MongoClient
 const ObjectId = require('mongodb').ObjectId
 const jwt = require('jsonwebtoken')
+const redis = require("redis");
 const config = require('../../env/config')
 const dataPath = 'mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority'
+const redis_client = redis.createClient(17054, "redis-17054.c53.west-us.azure.cloud.redislabs.com");
 
+redis_client.auth('zodiac3011', (err) => {
+    if (err) {
+        console.log(err)
+    }
+})
 
 router.get("/", async (req, res) => {
     mongo.connect(dataPath, async (err, client) => {
@@ -15,11 +22,28 @@ router.get("/", async (req, res) => {
             let result
             if (req.body.id != -1) {
                 result = await getJobs(client, req.body.id)
+
             }
             else {
-                result = await getAllJobs(client, req.body.page)
+                redis_client.get('AllJobs', async (err, reply) => {
+                    if (err) {
+                        return res.status(400).json(err)
+                    }
+                    else {
+                        if (reply == null) {
+                            result = await getAllJobs(client, req.body.page)
+                            if (!result.message){
+                                console.log("CACHING")
+                                redis_client.setex("AllJobs", 3600, JSON.stringify(result.info))
+                            }
+                            return res.status(result.code).json(result.message ? result.message : result.info)
+                        } else {
+                            console.log("GETTING")
+                            return res.status(200).json(JSON.parse(reply))
+                        }
+                    }
+                })
             }
-            return res.status(result.code).json(result.message ? result.message : result.info)
         }
     })
 })
