@@ -18,7 +18,7 @@ router.post('/', async (req, res) => {
     let username = req.body.username;
     let role = req.body.role; // 1: normal user, 2: recruiter
     let password = bcrypt.hashSync(req.body.password, 8);
-    let companyID = req.body.companyID
+    let company_ID = req.body.company_ID
     mongo.connect(dataPath, async (err, client) => {
         if (err) {
             console.log(err);
@@ -35,10 +35,10 @@ router.post('/', async (req, res) => {
                 if (role == 2) {
                     db.updateOne({ _id: info.ops[0]._id }, {
                         $set: {
-                            "companyID": ObjectId(companyID)
+                            "company_ID": ObjectId(company_ID)
                         }
                     })
-                    token = jwt.sign({ id: info.ops[0]._id, role: role, companyID: companyID }, config.secret, {
+                    token = jwt.sign({ id: info.ops[0]._id, role: role, company_ID: company_ID }, config.secret, {
                         expiresIn: 86400 // 24 hours
                     });
                     db.update({ _id: info.ops[0]._id }, {
@@ -46,7 +46,7 @@ router.post('/', async (req, res) => {
                             "auth.token": token
                         }
                     })
-                    client.db('job_recruitment').collection('companies').findOneAndUpdate({ "_id": ObjectId(companyID) }, {
+                    client.db('job_recruitment').collection('companies').findOneAndUpdate({ "_id": ObjectId(company_ID) }, {
                         $push: {
                             "recruiters": info.ops[0]._id
                         }

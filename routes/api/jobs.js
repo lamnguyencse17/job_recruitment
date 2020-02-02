@@ -10,7 +10,7 @@ const redis_client = redis.createClient(17054, "redis-17054.c53.west-us.azure.cl
 
 redis_client.auth('zodiac3011', (err) => {
     if (err) {
-        console.log(err)
+        throw (err)
     }
 })
 
@@ -21,25 +21,20 @@ router.get("/", async (req, res) => {
         } else {
             let result
             if (req.cached) {
-                console.log("GETTING")
                 return res.status(200).json(JSON.parse(req.cached))
             }
             else {
-                if (req.body.id != -1) {
-                    result = await getJobs(client, req.body.id)
+                if (req.body.job_ID != -1) {
+                    result = await getJobs(client, req.body.job_ID)
                     if (!result.message) {
-                        console.log("CACHING")
                         redis_client.setex(req.body.id, 3600, JSON.stringify(result.info))
                     }
                 }
                 else {
                     result = await getAllJobs(client, req.body.page)
-
-                    console.log("CACHING")
                     redis_client.setex("AllJobs", 3600, JSON.stringify(result.info))
                 }
             }
-
             return res.status(result.code).json(result.message ? result.message : result.info)
         }
     })
@@ -50,7 +45,7 @@ router.post("/", async (req, res) => {
         if (err) {
             return res.status(400).json({ message: err })
         } else {
-            let result = await postJobs(client, req.body.id, req.body.detail)
+            let result = await postJobs(client, req.body.company_ID, req.user, req.body.detail)
             return res.status(result.code).json(result.message ? result.message : result.info)
         }
     })
@@ -61,55 +56,25 @@ router.put("/", async (req, res) => {
         if (err) {
             return res.status(400).json({ message: err })
         } else {
-            let result = await putJobs(client, req.body.id, req.body.detail)
+            let result = await putJobs(client, req.body.job_ID, req.body.detail)
             return res.status(result.code).json(result.message ? result.message : result.info)
         }
     })
 })
 
 router.delete("/", async (req, res) => {
-    let job_id = req.body.job_id;
-    var token = req.headers['x-access-token'];
-    if (!token) return res.status(401).send({ message: "No token provided." });
-    jwt.verify(token, config.secret, (err, decoded) => {
-        if (err) { return status(500).send({ message: 'Failed to authenticate token.' }) } else {
-            mongo.connect(dataPath, async (err, client) => {
-                if (err) {
-                    console.log(err);
-                } else {
-                    var db = await client.db('job_recruitment').collection('profiles');
-                    let info = await db.find({ "_id": ObjectId(decoded.id) }).toArray()
-                    if (info.length == 0) {
-                        return res.status(400).json({ message: "Token verification failed" })
-                    }
-                    if (decoded.role == 1) {
-                        return res.status(400).json({ message: "No permission to delete" })
-                    }
-                    else {
-                        if (token == info[0].auth.token) {
-                            mongo.connect(dataPath, async (err, client) => {
-                                if (err) {
-                                    console.log(err);
-                                } else {
-                                    let db = await client.db('job_recruitment').collection('jobs');
-                                    info = await db.find({ "_id": ObjectId(job_id) }).toArray()
-                                    // eslint-disable-next-line no-unused-vars
-                                    let remove = await db.deleteOne({ _id: ObjectId(job_id) })
-                                    client.db('job_recruitment').collection('companies').findOneAndUpdate({ "_id": info[0].companyID }, {
-                                        $pull: {
-                                            jobs: ObjectId(job_id)
-                                        }
-                                    })
-                                    return res.status(200).json({ message: "Deleted" })
-                                }
-                            })
-                        }
-                        else {
-                            return res.status(400).json({ message: "Expired token" })
-                        }
-                    }
-                }
-            })
+    // body: job_ID
+    mongo.connect(dataPath, async (err, client) => {
+        if (err) {
+            return res.status(400).json({ message: err })
+        } else {
+            let validate = await client.db("job_recruitment").collection("jobs").findOne({ "_id": ObjectId(req.body.job_ID) }).toArray()
+            if (validate[0].recruiter_ID == req.user) {
+                // eslint-disable-next-line no-unused-vars
+                let result = await deleteJobs(client, req.body.job_ID)
+            } else {
+                return res.status(401).json({ message: "Not Authorized" })
+            }
         }
     })
 })
@@ -126,13 +91,10 @@ async function getAllJobs(client, page) { // page is to make sure that we're sen
     return { code: 200, info: info }
 }
 
-async function getJobs(client, id) {
-    if (!ObjectId.isValid(id)) {
-        return { code: 400, message: "Invalid Job ID" }
-    }
+async function getJobs(client, job_ID) {
     let info = await client.db('job_recruitment').collection("jobs").aggregate([{
         $match: {
-            _id: ObjectId(id)
+            _id: ObjectId(job_ID)
         }
     },
     {
@@ -146,7 +108,7 @@ async function getJobs(client, id) {
     if (info.length == 0) {
         return { code: 400, message: "Job does not exist" }
     } else {
-        delete info[0].companyID;
+        delete info[0].company_ID;
         delete info[0].cvs;
         delete info[0].company[0].jobs
         delete info[0].company[0].recuiters
@@ -154,15 +116,14 @@ async function getJobs(client, id) {
     }
 }
 
-async function postJobs(client, id, detail) {
-    if (!ObjectId.isValid(id)) {
-        return { code: 400, message: "Invalid Job ID" }
-    }
-    let info = await client.db('job_recruitment').collection("companies").find({ "_id": ObjectId(id) }).limit(1).toArray()
+async function postJobs(client, company_ID, job_ID, detail) {
+    let info = await client.db('job_recruitment').collection("companies").find({ "_id": ObjectId(company_ID) }).limit(1).toArray()
     if (info.length == 0) {
         return { code: 400, message: "Company ID does not exist" }
     } else {
         info = await client.db('job_recruitment').collection("jobs").insertOne({
+            "company_ID": ObjectId(company_ID),
+            "recruiter_ID": ObjectId(job_ID),
             "name": detail.name,
             "category": detail.category,
             "location": detail.location,
@@ -170,11 +131,10 @@ async function postJobs(client, id, detail) {
             "description": detail.description,
             "employees": detail.employees,
             "date": detail.date,
-            "companyID": ObjectId(id),
             "cvs": []
         })
         info = info.ops[0]
-        client.db('job_recruitment').collection('companies').findOneAndUpdate({ "_id": ObjectId(id) }, {
+        client.db('job_recruitment').collection('companies').findOneAndUpdate({ "_id": ObjectId(company_ID) }, {
             $push: {
                 "jobs": info._id
             }
@@ -183,36 +143,43 @@ async function postJobs(client, id, detail) {
     }
 }
 
-async function putJobs(client, id, detail) {
-    if (!ObjectId.isValid(id)) {
-        return { code: 400, message: "Invalid Job ID" }
-    }
-    else {
-        let info = await client.db('job_recruitment').collection("jobs").find({ "_id": ObjectId(id) }).limit(1).toArray()
-        if (info.length == 0) {
-            return { code: 400, message: "Job ID does not exist" }
-        } else {
-            // eslint-disable-next-line no-unused-vars
-            let result = await client.db('job_recruitment').collection('jobs').updateOne({ "_id": ObjectId(id) }, {
-                $set: {
-                    "name": detail.name ? detail.name : info[0].name,
-                    "category": detail.category ? detail.category : info[0].category,
-                    "location": detail.location ? detail.location : info[0].location,
-                    "salary": detail.salary ? detail.salary : info[0].salary,
-                    "description": detail.description ? detail.description : info[0].description,
-                    "employees": detail.employees ? detail.employees : info[0].employees,
-                    "date": detail.date ? detail.date : info[0].date,
-                }
-            })
-            info[0].name = detail.name ? detail.name : info[0].name
-            info[0].category = detail.category ? detail.category : info[0].category
-            info[0].location = detail.location ? detail.location : info[0].location
-            info[0].salary = detail.salary ? detail.salary : info[0].salary
-            info[0].description = detail.description ? detail.description : info[0].description
-            info[0].employees = detail.employees ? detail.employees : info[0].employees
-            info[0].date = detail.date ? detail.date : info[0].date
-            return { code: 200, message: info[0] }
-        }
+async function putJobs(client, job_ID, detail) {
+    let info = await client.db('job_recruitment').collection("jobs").find({ "_id": ObjectId(job_ID) }).limit(1).toArray()
+    if (info.length == 0) {
+        return { code: 400, message: "Job ID does not exist" }
+    } else {
+        // eslint-disable-next-line no-unused-vars
+        let result = await client.db('job_recruitment').collection('jobs').updateOne({ "_id": ObjectId(job_ID) }, {
+            $set: {
+                "name": detail.name ? detail.name : info[0].name,
+                "category": detail.category ? detail.category : info[0].category,
+                "location": detail.location ? detail.location : info[0].location,
+                "salary": detail.salary ? detail.salary : info[0].salary,
+                "description": detail.description ? detail.description : info[0].description,
+                "employees": detail.employees ? detail.employees : info[0].employees,
+                "date": detail.date ? detail.date : info[0].date,
+            }
+        })
+        info[0].name = detail.name ? detail.name : info[0].name
+        info[0].category = detail.category ? detail.category : info[0].category
+        info[0].location = detail.location ? detail.location : info[0].location
+        info[0].salary = detail.salary ? detail.salary : info[0].salary
+        info[0].description = detail.description ? detail.description : info[0].description
+        info[0].employees = detail.employees ? detail.employees : info[0].employees
+        info[0].date = detail.date ? detail.date : info[0].date
+        return { code: 200, message: info[0] }
     }
 }
+
+async function deleteJobs(client, job_ID) {
+    // eslint-disable-next-line no-unused-vars
+    let result = await client.db("job_recruitment").collection("jobs").deleteOne({ "_id": ObjectId(job_ID) })
+    client.db('job_recruitment').collection('companies').findOneAndUpdate({ "jobs": ObjectId(job_ID) }, {
+        $pull: {
+            jobs: ObjectId(ObjectId(job_ID))
+        }
+    })
+    return { code: 200, message: "Deleted" }
+}
+
 module.exports = router;

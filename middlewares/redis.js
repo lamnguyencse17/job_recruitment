@@ -13,16 +13,16 @@ module.exports = () => {
         } else {
             let id
         if (req.path == "/api/jobs"){
-            if (req.body.id == "-1"){
+            if (req.body.job_ID == "-1"){
                 id = "AllJobs"
             }
-            else id = req.body.id
+            else id = req.body.job_ID
         }
         if (req.path == "/api/companies"){
             if (req.body.page){
                 id = req.body.page
             }
-            else id = req.body.id
+            else id = req.body.company_ID
         }
         redis_client.get(id, (err, reply) => {
             if (err) {
@@ -34,6 +34,5 @@ module.exports = () => {
             next()
         })
         }
-         
     }
-  }
+}
