@@ -48,7 +48,7 @@ $ npm run dev
 
 ## Authors
 
-**Nguyen Quang Lam** - [lamnguyencs17](https://github.com/lamnguyencse17)
+**Nguyen Quang Lam** - [lamnguyencse17](https://github.com/lamnguyencse17)
 
 See also the list of [contributors](https://github.com/lamnguyencse17/job_recruitment/contributors) who participated in this project.
 

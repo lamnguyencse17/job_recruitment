@@ -5,10 +5,11 @@ const ObjectId = require('mongodb').ObjectId
 const redis = require('redis')
 const dataPath = 'mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority'
 const redis_client = redis.createClient(17054, "redis-17054.c53.west-us.azure.cloud.redislabs.com");
+const cacheLog = require('../../logging/modules/cacheLog.js')
 
 redis_client.auth('zodiac3011', (err) => {
     if (err) {
-        throw(err)
+        throw (err)
     }
 })
 
@@ -20,12 +21,12 @@ router.use((req, res, next) => {
         if (req.role == 1) {
             return res.status(400).json({ message: "Not Authorized" })
         }
+        next()
     }
-    next()
 })
 
 
-router.get('/', (req, res) => {
+router.get('/:company_ID', (req, res) => {
     mongo.connect(dataPath, async (err, client) => {
         if (err) {
             return res.status(400).json({ message: err })
@@ -35,19 +36,16 @@ router.get('/', (req, res) => {
                 return res.status(200).json(JSON.parse(req.cached))
             }
             else {
-                if (ObjectId.isValid(req.body.company_ID)) {
-                    result = await getCompanies(client, req.body.company_ID)
-                    if (!result.message) {
-                        redis_client.setex(req.body.company_ID, 3600, JSON.stringify(result.info))
-                    }
+                result = ObjectId.isValid(req.params) ?
+                    await getCompanies(client, req.params.company_ID) :
+                    await getAllCompanies(client, req.params.company_ID)
+                if (!result.message) {
+                    redis_client.setex(`companies_${req.params.company_ID}`, 3600, JSON.stringify(result.info), (err) => {
+                        cacheLog.writeLog(req.path, req.params, err)
+                    })
                 }
-                else {
-                    result = await getAllCompanies(client, req.body.page)
-                    redis_client.setex(req.body.page, 3600, JSON.stringify(result.info))
-                }
+                return res.status(result.code).json(result.message ? result.message : result.info)
             }
-
-            return res.status(result.code).json(result.message ? result.message : result.info)
         }
     })
 })
@@ -62,6 +60,7 @@ router.post("/", async (req, res) => {
         }
     })
 })
+
 router.put("/", async (req, res) => {
     mongo.connect(dataPath, async (err, client) => {
         if (err) {
@@ -74,56 +73,14 @@ router.put("/", async (req, res) => {
 })
 
 router.delete("/", async (req, res) => {
-    let company_ID = req.body.company_ID;
-    if (!req.user) {
-        return res.status(401).send({ message: "No token provided." });
-    }
-    else {
-        mongo.connect(dataPath, async (err, client) => {
-            if (err) {
-                console.log(err);
-            } else {
-                var db = await client.db('job_recruitment').collection('profiles');
-                let info = await db.find({ "_id": ObjectId(req.user) }).toArray()
-                if (info.length == 0) {
-                    return res.status(400).json({ message: "Token verification failed" })
-                }
-                if (req.role == 1) {
-                    return res.status(400).json({ message: "No permission to delete" })
-                }
-                else {
-                    if (req.user == info[0]._id) {
-                        mongo.connect(dataPath, async (err, client) => {
-                            if (err) {
-                                console.log(err);
-                            } else {
-                                let db = await client.db('job_recruitment').collection('companies');
-                                info = await db.find({ "_id": ObjectId(company_ID) }).toArray()
-                                if (info.length == 0) {
-                                    return res.status(400).json({ message: "Company ID does not exits" })
-                                } else {
-                                    if (info[0].recruiters.map(recruiter => {
-                                        recruiter == req.user
-                                    })) {
-                                        // eslint-disable-next-line no-unused-vars
-                                        let removeCompany = await db.deleteOne({ _id: ObjectId(company_ID) })
-                                        // eslint-disable-next-line no-unused-vars
-                                        let removeJobs = await client.db('job_recruitment').collection('jobs').deleteMany({ company_ID: ObjectId(company_ID) })
-                                        return res.status(200).json({ message: "Deleted" })
-                                    } else {
-                                        return res.status(400).json({ message: "No permission to delete" })
-                                    }
-                                }
-                            }
-                        })
-                    }
-                    else {
-                        return res.status(400).json({ message: "Expired token" })
-                    }
-                }
-            }
-        })
-    }
+    mongo.connect(dataPath, async (err, client) => {
+        if (err) {
+            return res.status(400).json({ message: err })
+        } else {
+            let result = await deleteCompanies(client, req.user, req.body.company_ID)
+            return res.status(result.code).json(result.message ? result.message : result.info)
+        }
+    })
 })
 
 
@@ -133,6 +90,7 @@ async function getAllCompanies(client, page) { // page is to make sure that we'r
         $query: {},
         $orderby: { $natural: -1 }
     }).limit(page * 10).toArray()
+
     info.map(field => {
         delete field.recruiters
         delete field.cvs
@@ -208,6 +166,34 @@ async function putCompanies(client, company_ID, detail) {
         info[0].phone = detail.phone ? detail.phone : info[0].phone
         info[0].email = detail.email ? detail.email : info[0].email
         return { code: 200, message: info[0] }
+    }
+}
+
+async function deleteCompanies(client, profile_ID, company_ID) {
+    let info = await client.db('job_recruitment').collection('companies').find({
+        "_id": ObjectId(company_ID)
+    }).toArray()
+    if (info.length == 0) {
+        return { code: 400, message: "Company ID does not exits" }
+    } else {
+        let validate = info[0].recruiters.map(recruiter => {
+            if (recruiter == profile_ID) {
+                return true
+            }
+        })
+        if (validate) {
+            // eslint-disable-next-line no-unused-vars
+            client.db('job_recruitment').collection('companies').deleteOne({
+                "_id": ObjectId(company_ID)
+            })
+            // eslint-disable-next-line no-unused-vars
+            client.db('job_recruitment').collection('jobs').deleteMany({
+                "company_ID": ObjectId(company_ID)
+            })
+            return { code: 200, info: "Deleted" }
+        } else {
+            return { code: 400, message: "No permission to delete" }
+        }
     }
 }
 

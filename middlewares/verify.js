@@ -6,10 +6,23 @@ const dataPath = 'mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure
 
 module.exports = () => {
     return async function (req, res, next) {
+        let params = req.path.split('/')
+        params = params[params.length - 1]
         let token = req.headers['x-access-token'];
         verifyObjectId(req.body).catch((value) => {
             return res.status(400).json({message: `${value} was invalid`})
         })
+        if (!req.path.includes("/auth")){
+            console.log(req.path)
+            if (["/api/companies", "/api/profiles", "/api/jobs"].includes(req.path)){
+                return res.status(400).json({ message: "Not Found" })
+            }
+            if (req.method != "GET" && ObjectId.isValid(params)){
+                return res.status(400).json({message: `${params} ID was invalid`})
+            } else if (!(/^\d+$/.test(params) || ObjectId.isValid(params))){
+                return res.status(400).json({message: `${params} ID was invalid`})
+            }
+        }
         let result = await jwtVerify(token, req)
         if (req.path == "/api/cvs") {
             if (!result) {

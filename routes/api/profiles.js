@@ -5,17 +5,16 @@ const ObjectId = require('mongodb').ObjectId
 const dataPath = 'mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority'
 
 
-router.get("/", async (req, res) => { // access own or other profile
-    let profile_ID = req.body.profile_ID
+router.get("/:profile_ID", async (req, res) => { // access own or other profile
     mongo.connect(dataPath, async (err, client) => {
         if (err) {
             console.log(err);
         } else {
             let result
-            if (req.user == req.body.profile_ID) {
-                result = await getProfilesOwner(client, profile_ID)
+            if (req.user == req.params.profile_ID) {
+                result = await getProfilesOwner(client, req.params.profile_ID)
             } else {
-                result = await getProfilesProtected(client, profile_ID)
+                result = await getProfilesProtected(client, req.params.profile_ID)
             }
             return res.status(result.code).json(result.message ? result.message : result.info)
         }

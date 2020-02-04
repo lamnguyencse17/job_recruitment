@@ -1,4 +1,5 @@
 const redis = require('redis')
+const cacheLog = require('../logging/modules/cacheLog')
 const redis_client = redis.createClient(17054, "redis-17054.c53.west-us.azure.cloud.redislabs.com");
 redis_client.auth('zodiac3011', (err) => {
     if (err) {
@@ -8,24 +9,21 @@ redis_client.auth('zodiac3011', (err) => {
 
 module.exports = () => {
     return async function (req, res, next) {
-        if (!["/api/jobs", "/api/companies"].includes(req.path)){
+        let params = req.path.split('/')
+        params = params[params.length - 1]
+        if (!req.path.includes("/api/companies","/api/jobs")){
             next()
         } else {
             let id
-        if (req.path == "/api/jobs"){
-            if (req.body.job_ID == "-1"){
-                id = "AllJobs"
-            }
-            else id = req.body.job_ID
+        if (req.path.includes("/api/jobs")){
+                id = `jobs_${params}`
         }
-        if (req.path == "/api/companies"){
-            if (req.body.page){
-                id = req.body.page
-            }
-            else id = req.body.company_ID
+        if (req.path.includes("/api/companies")){
+                id = `companies_${params}`
         }
         redis_client.get(id, (err, reply) => {
             if (err) {
+                cacheLog.writeLog(req.path, params, err)
                 return res.status(400).json({message: "Cache system gone wrong"})
             }
             if (reply != null){

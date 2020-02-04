@@ -2,11 +2,10 @@ const express = require('express')
 const router = express.Router();
 const mongo = require('mongodb').MongoClient
 const ObjectId = require('mongodb').ObjectId
-const jwt = require('jsonwebtoken')
 const redis = require("redis");
-const config = require('../../env/config')
 const dataPath = 'mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority'
 const redis_client = redis.createClient(17054, "redis-17054.c53.west-us.azure.cloud.redislabs.com");
+const cacheLog = require('../../logging/modules/cacheLog.js')
 
 redis_client.auth('zodiac3011', (err) => {
     if (err) {
@@ -14,7 +13,7 @@ redis_client.auth('zodiac3011', (err) => {
     }
 })
 
-router.get("/", async (req, res) => {
+router.get("/:job_ID", async (req, res) => {
     mongo.connect(dataPath, async (err, client) => {
         if (err) {
             return res.status(400).json({ message: err })
@@ -24,21 +23,51 @@ router.get("/", async (req, res) => {
                 return res.status(200).json(JSON.parse(req.cached))
             }
             else {
-                if (req.body.job_ID != -1) {
-                    result = await getJobs(client, req.body.job_ID)
-                    if (!result.message) {
-                        redis_client.setex(req.body.id, 3600, JSON.stringify(result.info))
-                    }
+                result = ObjectId.isValid(req.params.job_ID) ?
+                    await getJobs(client, req.params.job_ID) :
+                    await getAllJobs(client, req.params.job_ID)
+                if (!result.message) {
+                    redis_client.setex(`jobs_${req.params.job_ID}`, 3600, JSON.stringify(result.info), (err) => {
+                        cacheLog.writeLog(req.path, req.params.job_ID, err)
+                    })
                 }
-                else {
-                    result = await getAllJobs(client, req.body.page)
-                    redis_client.setex("AllJobs", 3600, JSON.stringify(result.info))
-                }
+                return res.status(result.code).json(result.message ? result.message : result.info)
             }
-            return res.status(result.code).json(result.message ? result.message : result.info)
         }
     })
 })
+
+// router.get("/", async (req, res) => {
+//     mongo.connect(dataPath, async (err, client) => {
+//         if (err) {
+//             return res.status(400).json({ message: err })
+//         } else {
+//             let result
+//             if (req.cached) {
+//                 return res.status(200).json(JSON.parse(req.cached))
+//             }
+//             else {
+//                 if (req.body.job_ID != -1) {
+//                     result = await getJobs(client, req.body.job_ID)
+//                     if (!result.message) {
+//                         redis_client.setex(req.body.id, 3600, JSON.stringify(result.info), (err) =>{
+//                             cacheLog.writeLog(req.path, req.body, err)
+//                         })
+//                     }
+//                     return res.status(result.code).json(result.message ? result.message : result.info)
+//                 }
+//                 else {
+//                     result = await getAllJobs(client, req.body.page)
+//                     redis_client.setex("AllJobs", 3600, JSON.stringify(result.info), (err) =>{
+//                         cacheLog.writeLog(req.path, req.body, err)
+//                     })
+//                     return res.status(result.code).json(result.message ? result.message : result.info)
+//                 }
+//             }
+//         }
+//     })
+//     return
+// })
 
 router.post("/", async (req, res) => {
     mongo.connect(dataPath, async (err, client) => {
