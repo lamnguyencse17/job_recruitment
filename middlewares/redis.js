@@ -13,26 +13,26 @@ module.exports = () => {
     return async function (req, res, next) {
         let params = req.path.split('/')
         params = params[params.length - 1]
-        if (!req.path.includes("/api/companies","/api/jobs")){
+        if (!req.path.includes("/api/companies", "/api/jobs")) {
             next()
         } else {
             let id
-        if (req.path.includes("/api/jobs")){
+            if (req.path.includes("/api/jobs")) {
                 id = `jobs_${params}`
-        }
-        if (req.path.includes("/api/companies")){
+            }
+            if (req.path.includes("/api/companies")) {
                 id = `companies_${params}`
-        }
-        redis_client.get(id, (err, reply) => {
-            if (err) {
-                cacheLog.writeLog(req.path, params, err)
-                return res.status(400).json({message: "Cache system gone wrong"})
             }
-            if (reply != null){
-                req.cached = reply
-            }
-            next()
-        })
+            redis_client.get(id, (err, reply) => {
+                if (err) {
+                    cacheLog.writeLog(req.path, params, err)
+                    return res.status(400).json({ message: "Cache system gone wrong" })
+                }
+                if (reply != null) {
+                    req.cached = reply
+                }
+                next()
+            })
         }
     }
 }

@@ -27,8 +27,8 @@ function writeLog(route, body, error) {
     }
 }
 
-function write(path, filename, data, error){
-    if (error){
+function write(path, filename, data, error) {
+    if (error) {
         path = path + "ERR-" + filename;
     } else {
         path = path + "CACHED-" + filename;

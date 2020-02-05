@@ -19,7 +19,7 @@ router.get("/:job_ID", async (req, res) => {
     mongo.connect(dataPath, async (err, client) => {
         if (err) {
             errorLog.writeLog(req.baseUrl, req.path, req.method, req.body, err)
-            return res.status(400).json({message: "Database system is not available"})
+            return res.status(400).json({ message: "Database system is not available" })
         } else {
             let result
             if (req.cached) {
@@ -47,7 +47,7 @@ router.post("/", async (req, res) => {
     mongo.connect(dataPath, async (err, client) => {
         if (err) {
             errorLog.writeLog(req.baseUrl, req.path, req.method, req.body, err)
-            return res.status(400).json({message: "Database system is not available"})
+            return res.status(400).json({ message: "Database system is not available" })
         } else {
             let result = await postJobs(client, req.body.company_ID, req.user, req.body.detail)
             return res.status(result.code).json(result.message ? result.message : result.info)
@@ -59,7 +59,7 @@ router.put("/", async (req, res) => {
     mongo.connect(dataPath, async (err, client) => {
         if (err) {
             errorLog.writeLog(req.baseUrl, req.path, req.method, req.body, err)
-            return res.status(400).json({message: "Database system is not available"})
+            return res.status(400).json({ message: "Database system is not available" })
         } else {
             let result = await putJobs(client, req.body.job_ID, req.body.detail)
             return res.status(result.code).json(result.message ? result.message : result.info)
@@ -72,7 +72,7 @@ router.delete("/", async (req, res) => {
     mongo.connect(dataPath, async (err, client) => {
         if (err) {
             errorLog.writeLog(req.baseUrl, req.path, req.method, req.body, err)
-            return res.status(400).json({message: "Database system is not available"})
+            return res.status(400).json({ message: "Database system is not available" })
         } else {
             let validate = await client.db("job_recruitment").collection("jobs").findOne({ "_id": ObjectId(req.body.job_ID) }).toArray()
             if (validate[0].recruiter_ID == req.user) {

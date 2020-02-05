@@ -41,7 +41,7 @@ router.get('/', async (req, res) => {
     mongo.connect(dataPath, async (err, client) => {
         if (err) {
             errorLog.writeLog(req.baseUrl, req.path, req.method, req.body, err)
-            return res.status(400).json({message: "Database system is not available"})
+            return res.status(400).json({ message: "Database system is not available" })
         } else {
             let result
             if (req.body.CV_ID) {
@@ -77,7 +77,7 @@ router.post('/', async (req, res) => {
     proofUpload(req, res, function (err) {
         if (err) {
             errorLog.writeLog(req.baseUrl, req.path, req.method, req.body, err)
-            return res.status(400).json({message: "Database system is not available"})
+            return res.status(400).json({ message: "Database system is not available" })
         }
         else {
             let proofPath = []
@@ -140,11 +140,13 @@ async function postCVS(client, profile_ID, job_ID, detail, proofPath) {
             "cvs": info._id
         }
     })
-    client.db('job_recruitment').collection('jobs').findOneAndUpdate({ "_id": ObjectId(job_ID) }, {
-        $push: {
-            "cvs": info._id
-        }
-    })
+    if (job_ID) {
+        client.db('job_recruitment').collection('jobs').findOneAndUpdate({ "_id": ObjectId(job_ID) }, {
+            $push: {
+                "cvs": info._id
+            }
+        })
+    }
     return { code: 200, message: info }
 }
 

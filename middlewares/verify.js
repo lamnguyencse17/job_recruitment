@@ -10,16 +10,16 @@ module.exports = () => {
         params = params[params.length - 1]
         let token = req.headers['x-access-token'];
         verifyObjectId(req.body).catch((value) => {
-            return res.status(400).json({message: `${value} was invalid`})
+            return res.status(400).json({ message: `${value} was invalid` })
         })
-        if (!(req.path.includes("/auth") || req.path.includes("/uploads"))){
-            if (["/api/companies", "/api/profiles", "/api/jobs"].includes(req.path)){
+        if (!(req.path.includes("/auth") || req.path.includes("/uploads"))) {
+            if (["/api/companies", "/api/profiles", "/api/jobs"].includes(req.path)) {
                 return res.status(400).json({ message: "Not Found" })
             }
-            if (req.method != "GET" && ObjectId.isValid(params)){
-                return res.status(400).json({message: `${params} ID was invalid`})
-            } else if (!(/^\d+$/.test(params) || ObjectId.isValid(params))){
-                return res.status(400).json({message: `${params} ID was invalid`})
+            if (req.method != "GET" && ObjectId.isValid(params)) {
+                return res.status(400).json({ message: `${params} ID was invalid` })
+            } else if (!(/^\d+$/.test(params) || ObjectId.isValid(params))) {
+                return res.status(400).json({ message: `${params} ID was invalid` })
             }
         }
         let result = await jwtVerify(token, req)
@@ -34,14 +34,14 @@ module.exports = () => {
 
 async function verifyObjectId(body) {
     for (let [key, value] of Object.entries(body)) {
-        if (typeof(value) == "object"){
-            if(!verifyObjectId(value)){
-                throw(value)
+        if (typeof (value) == "object") {
+            if (!verifyObjectId(value)) {
+                throw (value)
             }
         }
         if (["profile_ID", "company_ID", "CV_ID", "recruiter_ID", "job_ID"].includes(key)) {
             if (!ObjectId.isValid(value)) {
-                throw(value)
+                throw (value)
             }
         }
     }

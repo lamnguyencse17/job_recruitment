@@ -23,16 +23,16 @@ async function readLog(id, path) {
     path = `${path}/${id}`; // depends on where the modules are called
     let files = fs.readdirSync(path)
     files.map(file => {
-        if (file.includes('.log')){
+        if (file.includes('.log')) {
             let day = {}
-            day[file.replace('.log', '')] = fs.readFileSync(`${path}/${file}`,'utf8').replace('\r','').split('\n')
+            day[file.replace('.log', '')] = fs.readFileSync(`${path}/${file}`, 'utf8').replace('\r', '').split('\n')
             records = records.concat(day)
         }
     })
     return records
 }
 // Helper function
-function write(path, data, date){
+function write(path, data, date) {
     path = path + `/${data}.log`;
     date = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
     if (fs.existsSync(path)) {

@@ -6,8 +6,11 @@ const morgan = require('morgan')
 const compression = require('compression')
 const redis = require('./middlewares/redis')
 const verify = require('./middlewares/verify')
+const scheduler = require('./cron_jobs/scheduler')
 
 const app = express();
+scheduler()
+
 app.use(cors())
 app.use(helmet())
 app.use(compression())

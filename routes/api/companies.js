@@ -11,6 +11,7 @@ const errorLog = require('../../logging/modules/errorLog')
 
 redis_client.auth('zodiac3011', (err) => {
     if (err) {
+        errorLog.writeLog(__dirname, null, "auth", null, err)
         throw (err)
     }
 })

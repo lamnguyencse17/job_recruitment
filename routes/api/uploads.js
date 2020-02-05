@@ -25,7 +25,7 @@ router.get('/:profile_ID/:file_name', async (req, res) => {
         mongo.connect(dataPath, async (err, client) => {
             if (err) {
                 errorLog.writeLog(req.baseUrl, req.path, req.method, req.body, err)
-                return res.status(400).status({message: "Database system is not available"})
+                return res.status(400).status({ message: "Database system is not available" })
             }
             let recruiter = await client.db('job_recruitment').collection('jobs').find({ "recruiter_ID": ObjectId(req.user) }).toArray()
             let result = await client.db('job_recruitment').collection('cvs').find({
@@ -41,7 +41,7 @@ router.get('/:profile_ID/:file_name', async (req, res) => {
             }
         })
     }
-    if (permission){
+    if (permission) {
         if (fs.existsSync(path)) {
             return res.download(path)
         } else {
@@ -49,7 +49,7 @@ router.get('/:profile_ID/:file_name', async (req, res) => {
         }
     } else {
         return res.status(401).json({ message: "Not Authorized or Not found" })
-    }   
+    }
 })
 
 router.delete('/:profile_ID/:file_name', async (req, res) => {
@@ -60,7 +60,7 @@ router.delete('/:profile_ID/:file_name', async (req, res) => {
                 errorLog.writeLog(req.baseUrl, req.path, req.method, req.body, err)
                 return res.status(400).json({ message: err })
             } else {
-                return res.status(200).json({info: `Deleted file ${req.params.file_name}`})
+                return res.status(200).json({ info: `Deleted file ${req.params.file_name}` })
             }
         })
     } else {
