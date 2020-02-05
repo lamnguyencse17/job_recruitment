@@ -12,8 +12,7 @@ module.exports = () => {
         verifyObjectId(req.body).catch((value) => {
             return res.status(400).json({message: `${value} was invalid`})
         })
-        if (!req.path.includes("/auth")){
-            console.log(req.path)
+        if (!(req.path.includes("/auth") || req.path.includes("/uploads"))){
             if (["/api/companies", "/api/profiles", "/api/jobs"].includes(req.path)){
                 return res.status(400).json({ message: "Not Found" })
             }

@@ -4,6 +4,7 @@ const mongo = require('mongodb').MongoClient
 const ObjectId = require('mongodb').ObjectId
 const multer = require('multer')
 const fs = require('fs');
+const errorLog = require('../../logging/modules/errorLog')
 
 const dataPath = 'mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority'
 
@@ -39,7 +40,8 @@ router.use((req, res, next) => {
 router.get('/', async (req, res) => {
     mongo.connect(dataPath, async (err, client) => {
         if (err) {
-            return res.status(400).json({ message: err })
+            errorLog.writeLog(req.baseUrl, req.path, req.method, req.body, err)
+            return res.status(400).json({message: "Database system is not available"})
         } else {
             let result
             if (req.body.CV_ID) {
@@ -74,12 +76,13 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
     proofUpload(req, res, function (err) {
         if (err) {
-            return res.status(400).json({ message: err });
+            errorLog.writeLog(req.baseUrl, req.path, req.method, req.body, err)
+            return res.status(400).json({message: "Database system is not available"})
         }
         else {
             let proofPath = []
             req.files.map(file => {
-                proofPath.push(file.path)
+                proofPath.push(`./uploads/${req.user}/${file.originalname}`)
             })
             mongo.connect(dataPath, async (err, client) => {
                 if (err) {

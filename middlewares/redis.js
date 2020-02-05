@@ -1,9 +1,11 @@
 const redis = require('redis')
 const cacheLog = require('../logging/modules/cacheLog')
 const redis_client = redis.createClient(17054, "redis-17054.c53.west-us.azure.cloud.redislabs.com");
+const errorLog = require('../logging/modules/errorLog')
+
 redis_client.auth('zodiac3011', (err) => {
     if (err) {
-        console.log(err)
+        errorLog.writeLog("Redis Middleware", __dirname, "auth", null, err)
     }
 })
 

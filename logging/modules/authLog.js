@@ -1,4 +1,5 @@
 const fs = require('fs');
+const errorLog = require('./errorLog')
 
 function writeLog(id, path) {
     path = `${path}/${id}`
@@ -9,7 +10,7 @@ function writeLog(id, path) {
     } else {
         fs.mkdir(path, (err) => {
             if (err) {
-                console.log(err)
+                errorLog.writeLog("CacheLog", __dirname, "mkdir", path, err)
             } else {
                 write(path, data, date)
             }
@@ -25,7 +26,6 @@ async function readLog(id, path) {
         if (file.includes('.log')){
             let day = {}
             day[file.replace('.log', '')] = fs.readFileSync(`${path}/${file}`,'utf8').replace('\r','').split('\n')
-            console.log(day)
             records = records.concat(day)
         }
     })
@@ -40,7 +40,7 @@ function write(path, data, date){
     } else {
         fs.writeFile(path, date, (err) => {
             if (err) {
-                console.log(err)
+                errorLog.writeLog("authLog", __dirname, "writeFile", path, err)
             } else {
                 console.log("success!")
             }

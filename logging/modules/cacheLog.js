@@ -1,7 +1,7 @@
 const fs = require('fs');
+const errorLog = require('./errorLog')
 
 function writeLog(route, body, error) {
-    console.log(__dirname)
     let date = new Date();
     let foldername = `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
     let filename = `${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}.log`;
@@ -19,7 +19,7 @@ function writeLog(route, body, error) {
     } else {
         fs.mkdir(path, (err) => {
             if (err) {
-                console.log(err)
+                errorLog.writeLog("CacheLog", __dirname, "mkdir", path, err)
             } else {
                 write(path, filename, data, error)
             }
@@ -35,9 +35,7 @@ function write(path, filename, data, error){
     }
     fs.writeFile(path, data, (err) => {
         if (err) {
-            console.log(err)
-        } else {
-            console.log("success!")
+            errorLog.writeLog("CacheLog", __dirname, "writeFile", path, err)
         }
     })
 }

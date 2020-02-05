@@ -6,6 +6,8 @@ const redis = require('redis')
 const dataPath = 'mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority'
 const redis_client = redis.createClient(17054, "redis-17054.c53.west-us.azure.cloud.redislabs.com");
 const cacheLog = require('../../logging/modules/cacheLog.js')
+const errorLog = require('../../logging/modules/errorLog')
+
 
 redis_client.auth('zodiac3011', (err) => {
     if (err) {
@@ -29,7 +31,8 @@ router.use((req, res, next) => {
 router.get('/:company_ID', (req, res) => {
     mongo.connect(dataPath, async (err, client) => {
         if (err) {
-            return res.status(400).json({ message: err })
+            errorLog.writeLog(req.baseUrl, req.path, req.method, req.body, err)
+            return res.status(400).json({ message: "Database system is not available" })
         } else {
             let result
             if (req.cached) {
@@ -53,7 +56,8 @@ router.get('/:company_ID', (req, res) => {
 router.post("/", async (req, res) => {
     mongo.connect(dataPath, async (err, client) => {
         if (err) {
-            return res.status(400).json({ message: err })
+            errorLog.writeLog(req.baseUrl, req.path, req.method, req.body, err)
+            return res.status(400).json({ message: "Database system is not available" })
         } else {
             let result = await postCompanies(client, req.body)
             return res.status(result.code).json(result.message ? result.message : result.info)
@@ -64,7 +68,8 @@ router.post("/", async (req, res) => {
 router.put("/", async (req, res) => {
     mongo.connect(dataPath, async (err, client) => {
         if (err) {
-            return res.status(400).json({ message: err })
+            errorLog.writeLog(req.baseUrl, req.path, req.method, req.body, err)
+            return res.status(400).json({ message: "Database system is not available" })
         } else {
             let result = await putCompanies(client, req.body.company_ID, req.body.detail)
             return res.status(result.code).json(result.message ? result.message : result.info)
@@ -75,7 +80,8 @@ router.put("/", async (req, res) => {
 router.delete("/", async (req, res) => {
     mongo.connect(dataPath, async (err, client) => {
         if (err) {
-            return res.status(400).json({ message: err })
+            errorLog.writeLog(req.baseUrl, req.path, req.method, req.body, err)
+            return res.status(400).json({ message: "Database system is not available" })
         } else {
             let result = await deleteCompanies(client, req.user, req.body.company_ID)
             return res.status(result.code).json(result.message ? result.message : result.info)

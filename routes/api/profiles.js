@@ -2,13 +2,15 @@ const express = require('express')
 const router = express.Router();
 const mongo = require('mongodb').MongoClient
 const ObjectId = require('mongodb').ObjectId
+const errorLog = require('../../logging/modules/errorLog')
 const dataPath = 'mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority'
 
 
 router.get("/:profile_ID", async (req, res) => { // access own or other profile
     mongo.connect(dataPath, async (err, client) => {
         if (err) {
-            console.log(err);
+            errorLog.writeLog(req.baseUrl, req.path, req.method, req.body, err)
+            return res.status(400).json({message: "Database system is not available"})
         } else {
             let result
             if (req.user == req.params.profile_ID) {
@@ -25,7 +27,8 @@ router.post("/", async (req, res) => {
     // body: profile_ID, detail: {name, dob, email, date}
     mongo.connect(dataPath, async (err, client) => {
         if (err) {
-            console.log(err);
+            errorLog.writeLog(req.baseUrl, req.path, req.method, req.body, err)
+            return res.status(400).json({message: "Database system is not available"})
         } else {
             let result = await postProfiles(client, req.body.profile_ID, req.body.detail)
             return res.status(result.code).json(result.message ? result.message : result.info)
@@ -37,7 +40,8 @@ router.put("/", (req, res) => {
     // body: profile_ID, detail: {name, dob, email, date}
     mongo.connect(dataPath, async (err, client) => {
         if (err) {
-            console.log(err);
+            errorLog.writeLog(req.baseUrl, req.path, req.method, req.body, err)
+            return res.status(400).json({message: "Database system is not available"})
         } else {
             let result = await putProfiles(client, req.body.profile_ID, req.body.detail)
             return res.status(result.code).json(result.message ? result.message : result.info)
@@ -49,7 +53,8 @@ router.delete("/", (req, res) => {
     // TODOS: Split to function
     mongo.connect(dataPath, async (err, client) => {
         if (err) {
-            console.log(err);
+            errorLog.writeLog(req.baseUrl, req.path, req.method, req.body, err)
+            return res.status(400).json({message: "Database system is not available"})
         } else {
             let validate = await client.db('job_recruitment').collection('profiles').find({
                 "_id": ObjectId(req.body.profile_ID)

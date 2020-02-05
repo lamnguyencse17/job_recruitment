@@ -6,9 +6,11 @@ const redis = require("redis");
 const dataPath = 'mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority'
 const redis_client = redis.createClient(17054, "redis-17054.c53.west-us.azure.cloud.redislabs.com");
 const cacheLog = require('../../logging/modules/cacheLog.js')
+const errorLog = require('../../logging/modules/errorLog')
 
 redis_client.auth('zodiac3011', (err) => {
     if (err) {
+        errorLog.writeLog(__dirname, null, "auth", null, err)
         throw (err)
     }
 })
@@ -16,7 +18,8 @@ redis_client.auth('zodiac3011', (err) => {
 router.get("/:job_ID", async (req, res) => {
     mongo.connect(dataPath, async (err, client) => {
         if (err) {
-            return res.status(400).json({ message: err })
+            errorLog.writeLog(req.baseUrl, req.path, req.method, req.body, err)
+            return res.status(400).json({message: "Database system is not available"})
         } else {
             let result
             if (req.cached) {
@@ -29,6 +32,9 @@ router.get("/:job_ID", async (req, res) => {
                 if (!result.message) {
                     redis_client.setex(`jobs_${req.params.job_ID}`, 3600, JSON.stringify(result.info), (err) => {
                         cacheLog.writeLog(req.path, req.params.job_ID, err)
+                        if (err) {
+                            errorLog.writeLog(req.baseUrl, req.path, req.method, req.body, err)
+                        }
                     })
                 }
                 return res.status(result.code).json(result.message ? result.message : result.info)
@@ -37,42 +43,11 @@ router.get("/:job_ID", async (req, res) => {
     })
 })
 
-// router.get("/", async (req, res) => {
-//     mongo.connect(dataPath, async (err, client) => {
-//         if (err) {
-//             return res.status(400).json({ message: err })
-//         } else {
-//             let result
-//             if (req.cached) {
-//                 return res.status(200).json(JSON.parse(req.cached))
-//             }
-//             else {
-//                 if (req.body.job_ID != -1) {
-//                     result = await getJobs(client, req.body.job_ID)
-//                     if (!result.message) {
-//                         redis_client.setex(req.body.id, 3600, JSON.stringify(result.info), (err) =>{
-//                             cacheLog.writeLog(req.path, req.body, err)
-//                         })
-//                     }
-//                     return res.status(result.code).json(result.message ? result.message : result.info)
-//                 }
-//                 else {
-//                     result = await getAllJobs(client, req.body.page)
-//                     redis_client.setex("AllJobs", 3600, JSON.stringify(result.info), (err) =>{
-//                         cacheLog.writeLog(req.path, req.body, err)
-//                     })
-//                     return res.status(result.code).json(result.message ? result.message : result.info)
-//                 }
-//             }
-//         }
-//     })
-//     return
-// })
-
 router.post("/", async (req, res) => {
     mongo.connect(dataPath, async (err, client) => {
         if (err) {
-            return res.status(400).json({ message: err })
+            errorLog.writeLog(req.baseUrl, req.path, req.method, req.body, err)
+            return res.status(400).json({message: "Database system is not available"})
         } else {
             let result = await postJobs(client, req.body.company_ID, req.user, req.body.detail)
             return res.status(result.code).json(result.message ? result.message : result.info)
@@ -83,7 +58,8 @@ router.post("/", async (req, res) => {
 router.put("/", async (req, res) => {
     mongo.connect(dataPath, async (err, client) => {
         if (err) {
-            return res.status(400).json({ message: err })
+            errorLog.writeLog(req.baseUrl, req.path, req.method, req.body, err)
+            return res.status(400).json({message: "Database system is not available"})
         } else {
             let result = await putJobs(client, req.body.job_ID, req.body.detail)
             return res.status(result.code).json(result.message ? result.message : result.info)
@@ -95,7 +71,8 @@ router.delete("/", async (req, res) => {
     // body: job_ID
     mongo.connect(dataPath, async (err, client) => {
         if (err) {
-            return res.status(400).json({ message: err })
+            errorLog.writeLog(req.baseUrl, req.path, req.method, req.body, err)
+            return res.status(400).json({message: "Database system is not available"})
         } else {
             let validate = await client.db("job_recruitment").collection("jobs").findOne({ "_id": ObjectId(req.body.job_ID) }).toArray()
             if (validate[0].recruiter_ID == req.user) {

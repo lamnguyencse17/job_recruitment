@@ -25,6 +25,7 @@ app.use('/api/profiles', require('./routes/api/profiles'))
 app.use('/api/jobs', require('./routes/api/jobs'))
 app.use('/api/companies', require('./routes/api/companies'))
 app.use('/api/cvs', require('./routes/api/cvs'))
+app.use('/api/uploads', require('./routes/api/uploads'))
 
 const PORT = process.env.PORT || 5000;
 

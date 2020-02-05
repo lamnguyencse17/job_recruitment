@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken')
 const config = require('../../../env/config')
 const authLog = require('../../../logging/modules/authLog')
 const dataPath = 'mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority'
-
+const errorLog = require('../../../logging/modules/errorLog')
 
 
 router.get('/', (req, res) => {
@@ -18,7 +18,8 @@ router.post('/', async (req, res) => {
     var password = req.body.password;
     mongo.connect(dataPath, async (err, client) => {
         if (err) {
-            console.log(err);
+            errorLog.writeLog(req.baseUrl, req.path, req.method, req.body, err)
+            return res.status(400).json({ message: "Database system is not available" })
         } else {
             var db = await client.db('job_recruitment').collection('profiles');
             let info = await db.find({ "auth.username": username }).toArray() // Clearly it will only return 1

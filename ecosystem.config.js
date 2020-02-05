@@ -1,14 +1,14 @@
 module.exports = {
   apps : [{
     name: 'API',
-    script: 'npm run dev',
+    script: 'index.js',
 
     // Options reference: https://pm2.keymetrics.io/docs/usage/application-declaration/
     args: 'one two',
     instances: 5,
     autorestart: false,
     watch: true,
-    max_memory_restart: '2G',
+    max_memory_restart: '8G',
     env: {
       NODE_ENV: 'development'
     },
