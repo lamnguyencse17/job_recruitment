@@ -3,22 +3,11 @@ const router = express.Router();
 const mongo = require('mongodb').MongoClient
 const ObjectId = require('mongodb').ObjectId
 const fs = require('fs')
-const errorLog = require('../../logging/modules/errorLog')
+const errorLog = require('../../../logging/modules/errorLog')
 const dataPath = 'mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority'
 
-
-router.use((req, res, next) => {
-    if (["PUT", "POST"].includes(req.method)) {
-        return res.status(401).json({ message: "Not allowed" })
-    } else {
-        if (req.user != req.params.profile_ID && req.role != 2) {
-            return res.status(401).json({ message: "Not allowed" })
-        }
-        next()
-    }
-})
-
 router.get('/:profile_ID/:file_name', async (req, res) => {
+    console.log("DEBUF")
     let permission = true
     let path = `./uploads/${req.params.profile_ID}/${req.params.file_name}`
     if (req.role == 2) {

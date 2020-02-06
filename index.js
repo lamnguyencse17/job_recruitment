@@ -20,15 +20,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(verify())
 app.use(redis())
 
-app.use('/api/auths/login', require('./routes/api/auths/login'))
-app.use('/api/auths/register', require('./routes/api/auths/register'))
-app.use('/api/auths/verify', require('./routes/api/auths/verify'))
-app.use('/api/auths/logout', require('./routes/api/auths/logout'))
-app.use('/api/profiles', require('./routes/api/profiles'))
-app.use('/api/jobs', require('./routes/api/jobs'))
-app.use('/api/companies', require('./routes/api/companies'))
-app.use('/api/cvs', require('./routes/api/cvs'))
-app.use('/api/uploads', require('./routes/api/uploads'))
+app.use('/admin', require('./routes/admin'))
+app.use('/api', require('./routes/api'))
 
 const PORT = process.env.PORT || 5000;
 

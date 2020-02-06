@@ -3,19 +3,7 @@ const router = express.Router();
 const mongo = require('mongodb').MongoClient
 const ObjectId = require('mongodb').ObjectId
 const dataPath = 'mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority'
-const errorLog = require('../../logging/modules/errorLog')
-
-router.use((req, res, next) => {
-    if (["GET", "PUT"].includes(req.method)) {
-        return res.status(400).json({ message: "Not allowed" })
-    } else {
-        if (!req.user || req.role == 2) {
-            return res.status(400).json({ message: "Not allowed" })
-        } else {
-            next()
-        }
-    }
-})
+const errorLog = require('../../../logging/modules/errorLog')
 
 router.post("/:job_ID", (req, res) => {
     // body: CV_ID

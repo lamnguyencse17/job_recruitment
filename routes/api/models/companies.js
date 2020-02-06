@@ -5,26 +5,14 @@ const ObjectId = require('mongodb').ObjectId
 const redis = require('redis')
 const dataPath = 'mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority'
 const redis_client = redis.createClient(17054, "redis-17054.c53.west-us.azure.cloud.redislabs.com");
-const cacheLog = require('../../logging/modules/cacheLog.js')
-const errorLog = require('../../logging/modules/errorLog')
+const cacheLog = require('../../../logging/modules/cacheLog.js')
+const errorLog = require('../../../logging/modules/errorLog')
 
 
 redis_client.auth('zodiac3011', (err) => {
     if (err) {
         errorLog.writeLog(__dirname, null, "auth", null, err)
         throw (err)
-    }
-})
-
-
-router.use((req, res, next) => {
-    if (req.method == "GET") {
-        next()
-    } else {
-        if (req.role == 1) {
-            return res.status(400).json({ message: "Not Authorized" })
-        }
-        next()
     }
 })
 

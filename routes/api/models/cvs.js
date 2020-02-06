@@ -4,7 +4,7 @@ const mongo = require('mongodb').MongoClient
 const ObjectId = require('mongodb').ObjectId
 const multer = require('multer')
 const fs = require('fs');
-const errorLog = require('../../logging/modules/errorLog')
+const errorLog = require('../../../logging/modules/errorLog')
 
 const dataPath = 'mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority'
 
@@ -27,15 +27,6 @@ const storage = multer.diskStorage({
 });
 
 const proofUpload = multer({ storage: storage }).array('proof', 5);
-
-
-router.use((req, res, next) => {
-    if ((req.role == 2 && req.method != "GET") || !req.user) {
-        return res.status(400).json({ message: "Not Authorized" })
-    } else {
-        next()
-    }
-})
 
 router.get('/', async (req, res) => {
     mongo.connect(dataPath, async (err, client) => {
