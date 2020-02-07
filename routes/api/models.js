@@ -1,7 +1,12 @@
 const express = require('express')
+const ObjectId = require('mongodb').ObjectId
 const router = express.Router();
 
-router.use('/companies', function(req, res, next){
+router.use('/companies/', function (req, res, next) {
+    let param = req.path.replace("/", "")
+    if (!paramValidate(req, param)){
+        return res.status(400).json({ message: `${param} ID was invalid` })
+    }
     if (req.method == "GET") {
         next()
     } else {
@@ -12,7 +17,14 @@ router.use('/companies', function(req, res, next){
     }
 }, require('./models/companies'))
 
-router.use('/cvs', function(req, res, next){
+router.use('/cvs', function (req, res, next) {
+    let param = req.path.replace("/", "")
+    if (!paramValidate(req, param)){
+        return res.status(400).json({ message: `${param} ID was invalid` })
+    }
+    if (!req.token) {
+        return res.status(401).json({ message: "Token Failed" })
+    }
     if ((req.role == 2 && req.method != "GET") || !req.user) {
         return res.status(400).json({ message: "Not Authorized" })
     } else {
@@ -20,8 +32,29 @@ router.use('/cvs', function(req, res, next){
     }
 }, require('./models/cvs'))
 
-router.use('/jobs', require('./models/cvs'))
+router.use('/jobs', function(req, res, next){
+    let param = req.path.replace("/", "")
+    if (!paramValidate(req, param)){
+        return res.status(400).json({ message: `${param} ID was invalid` })
+    }
+    next()
+}, require('./models/cvs'))
 
-router.use('/profiles', require('./models/cvs'))
+router.use('/profiles', function(req, res, next){
+    let param = req.path.replace("/", "")
+    if (!paramValidate(req, param)){
+        return res.status(400).json({ message: `${param} ID was invalid` })
+    }
+    next()
+}, require('./models/cvs'))
+
+function paramValidate(req, param){
+    if (req.method != "GET" && ObjectId.isValid(param)) {
+        return false
+    } else if (!(/^\d+$/.test(param) || ObjectId.isValid(param))) {
+        return false
+    }
+    return true
+}
 
 module.exports = router;

@@ -28,7 +28,7 @@ router.get('/:company_ID', (req, res) => {
                 return res.status(200).json(JSON.parse(req.cached))
             }
             else {
-                result = ObjectId.isValid(req.params) ?
+                result = ObjectId.isValid(req.params.company_ID) ?
                     await getCompanies(client, req.params.company_ID) :
                     await getAllCompanies(client, req.params.company_ID)
                 if (!result.message) {

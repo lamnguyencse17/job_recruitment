@@ -6,14 +6,12 @@ This project intends to be a simulation project to increase my own coding skill.
 
 ## Installation
 
-- All the `code` required to get started
-- Images of what it should look like
+- You can grab a Docker image at: `https://hub.docker.com/repository/docker/zodiac3011/job_recruitment`
+- Alternatively, you may follow the instructions below.
 
 ---
 
 ### Setup
-
-- If you want more syntax highlighting, format your code like this:
 
 - update and upgrade your system first
 

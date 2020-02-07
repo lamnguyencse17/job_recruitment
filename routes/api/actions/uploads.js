@@ -7,7 +7,9 @@ const errorLog = require('../../../logging/modules/errorLog')
 const dataPath = 'mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority'
 
 router.get('/:profile_ID/:file_name', async (req, res) => {
-    console.log("DEBUF")
+    if (!ObjectId.isValid(req.params.profile_ID)){
+        return res.status(400).json({message: "profile ID is not valid"})
+    }
     let permission = true
     let path = `./uploads/${req.params.profile_ID}/${req.params.file_name}`
     if (req.role == 2) {

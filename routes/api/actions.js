@@ -25,4 +25,18 @@ router.use('/uploads', function(req, res, next){
     next()
 }, require('./actions/uploads'))
 
+router.use('/invite', function(req, res, next){
+    if (req.method != "POST" || req.role != 2) {
+        return res.status(401).json({ message: "Not allowed" })
+    }
+    next()
+}, require('./actions/invite'))
+
+router.use('/subscribe', function(req, res, next){
+    if (req.method != "POST" || req.role != 2) {
+        return res.status(401).json({ message: "Not allowed" })
+    }
+    next()
+}, require('./actions/subscribe'))
+
 module.exports = router;
