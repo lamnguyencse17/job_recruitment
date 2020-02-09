@@ -39,4 +39,18 @@ router.use('/subscribe', function(req, res, next){
     next()
 }, require('./actions/subscribe'))
 
+router.use('/search', function(req, res, next){
+    if (req.method != "GET") {
+        return res.status(401).json({ message: "Not allowed" })
+    }
+    next()
+}, require('./actions/search'))
+
+router.use('/suggest', function(req, res, next){
+    if (req.method != "POST") {
+        return res.status(401).json({ message: "Not allowed" })
+    }
+    next()
+}, require('./actions/suggest'))
+
 module.exports = router;

@@ -14,7 +14,7 @@ router.post('/', (req, res) => {
     mongo.connect(dataPath, (err, client) => {
         if (err) {
             errorLog.writeLog(req.baseUrl, req.path, req.method, req.body, err)
-            return res.status(400).status({ message: "Database system is not available" })
+            return res.status(400).json({ message: "Database system is not available" })
         }
         let result = client.db("job_recruitment").collection("newsletter").insertOne({"email": req.body.email})
         if (!result.acknowledged){

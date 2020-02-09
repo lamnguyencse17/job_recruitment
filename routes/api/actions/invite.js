@@ -16,7 +16,7 @@ router.post('/', (req, res) => {
     mongo.connect(dataPath, (err, client) => {
         if (err) {
             errorLog.writeLog(req.baseUrl, req.path, req.method, req.body, err)
-            return res.status(400).status({ message: "Database system is not available" })
+            return res.status(400).json({ message: "Database system is not available" })
         }
         let username = client.db("job_recruitment").collection("profiles").find({"_id": ObjectId(req.user)}).toArray()
         username = username[0].auth.username
