@@ -14,7 +14,7 @@ module.exports = () => {
     return async function (req, res, next) {
         let params = req.path.split('/')
         params = params[params.length - 1]
-        if (!req.path.includes("/api/companies", "/api/jobs")) {
+        if (!req.path.includes("/api/companies", "/api/jobs", "/api/tags")) {
             next()
         } else {
             let id
