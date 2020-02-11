@@ -7,6 +7,9 @@ import Modal from "react-bootstrap/Modal";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { bindActionCreators } from "redux";
+
+import {logoutProcess} from "../../actions/auth"
+
 import {
   BrowserRouter as Router,
   Switch,
@@ -18,42 +21,35 @@ import {
   withRouter,
 } from "react-router-dom";
 
+import LoginModals from "./Modals/LoginModals"
+
 class Headnav extends Component {
   constructor(props) {
     super(props);
     this.state = {
       register: false,
       login: false,
-      email: "",
-      password: "",
     };
   }
-  handleClose() {
-    this.setState(state => ({
+
+  handleClose = () => {
+    this.setState(() => ({
       register: false,
       login: false,
     }));
   }
-  handleChange(e) {
-    this.setState({ [e.target.name]: e.target.value });
+
+  handleLogOut = () => {
+    this.props.logoutProcess(this.props.token)
   }
-  handleSubmission() {
-    if (this.state.register == true) {
-      console.log("REGISTER")
-    } else {
-      console.log("LOGIN")
-    }
-    this.setState(state => ({
-      register: false,
-      login: false,
-    }));
-  }
+
   render() {
     return (
       <div className="container-fluid" style={{ padding: 0 }}>
+        <LoginModals show={this.state.login} handleClose={this.handleClose} />
         <Navbar bg="dark" expand="lg" variant="dark">
           <Link to="/">
-            <Navbar.Brand> IT Source</Navbar.Brand>
+            <Navbar.Brand> Job_Recruitment</Navbar.Brand>
           </Link>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
@@ -80,61 +76,7 @@ class Headnav extends Component {
                 </Link>
               </Nav>
             </Nav>
-            <Modal
-              show={this.state.register || this.state.login}
-              onHide={this.handleClose.bind(this)}>
-              <Modal.Header closeButton>
-                {this.state.register ? (
-                  <Modal.Title>Sign up </Modal.Title>
-                ) : (
-                    <Modal.Title>Login </Modal.Title>
-                  )}
-              </Modal.Header>
-              <Modal.Body>
-                <Form>
-                  <Form.Group controlId="formSignup">
-                    <Form.Label>Email address</Form.Label>
-                    <Form.Control
-                      type="email"
-                      placeholder="Enter your email"
-                      onChange={this.handleChange.bind(this)}
-                    />
-                    <Form.Text className="text-muted">
-                      We will never share your email with anyone else
-                    </Form.Text>
-                    <Form.Label>Password</Form.Label>
-                    <Form.Control
-                      type="password"
-                      placeholder="Password"
-                      onChange={this.handleChange.bind(this)}
-                    />
-                  </Form.Group>
-                </Form>
-              </Modal.Body>
-              <Modal.Footer>
-                <Button
-                  variant="secondary"
-                  onClick={this.handleClose.bind(this)}>
-                  Close
-                </Button>
-                {this.state.login ? (
-                  <Link to="/">
-                    <Button
-                      variant="primary"
-                      onClick={this.handleSubmission.bind(this)}>
-                      Submit
-                    </Button>
-                  </Link>
-                ) : (
-                    <Button
-                      variant="primary"
-                      onClick={this.handleSubmission.bind(this)}>
-                      Submit
-                  </Button>
-                  )}
-              </Modal.Footer>
-            </Modal>
-            {this.props.login ? (
+            {this.props.token ? (
               <Nav>
                 <Nav>
                   <Link className="nav-link" to="/profile">
@@ -142,7 +84,7 @@ class Headnav extends Component {
                   </Link>
                 </Nav>
                 <Nav>
-                  <Link className="nav-link" to="/signout">
+                  <Link onClick={this.handleLogOut} className="nav-link" to="/signout">
                     Sign Out
                   </Link>
                 </Nav>
@@ -179,23 +121,27 @@ class Headnav extends Component {
   }
 }
 
-// function mapStateToProps(state) {
-//   return {
-//     email: state.account.email,
-//     token: state.account.token,
-//     login: state.control.login,
-//   };
-// }
+Headnav.propTypes = {
+  token: PropTypes.string,
+  logoutProcess: PropTypes.func.isRequired
+}
 
-// function mapDispatchToProps(dispatch) {
-//   return bindActionCreators(
-//     { registerProcess, loginProcess, displayHome, displayJobs },
-//     dispatch
-//   );
-// }
+function mapStateToProps(state) {
+  return {
+    id: state.auth.id,
+    email: state.auth.email,
+    token: state.auth.token,
+    username: state.auth.username,
+  };
+}
 
-export default withRouter(Headnav);
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators(
+    { logoutProcess },
+    dispatch
+  );
+}
 
-// export default withRouter(
-//   connect(mapStateToProps, mapDispatchToProps)(Headnav)
-// );
+export default withRouter(
+  connect(mapStateToProps, mapDispatchToProps)(Headnav)
+);

@@ -37,8 +37,8 @@ router.post('/', async (req, res) => {
                         }
                     })
                     let path = './logging/logs/auth'
-                    authLog.readLog(info[0]._id, path)
-                    return res.status(200).json({ id: info[0]._id, token: token })
+                    authLog.writeLog(info[0]._id, path)
+                    return res.status(200).json({ id: info[0]._id, username: info[0].auth.username, email: info[0].email ? info[0].email : null, token: token })
                 }
                 else {
                     res.status(400).json({ message: "Wrong credentials" })

@@ -23,7 +23,8 @@ router.post('/', (req, res) => {
                         return res.status(400).json({ message: "Token verification failed" })
                     }
                     else {
-                        if (token == info[0].token) {
+                        if (token == info[0].auth.token) {
+                            console.log("CHECK")
                             db.update({ _id: ObjectId(decoded.id) }, {
                                 $set: {
                                     "auth.token": ""
