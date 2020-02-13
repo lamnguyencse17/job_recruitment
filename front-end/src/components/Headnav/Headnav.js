@@ -1,9 +1,6 @@
 import React, { Component } from "react";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
-import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
-import Modal from "react-bootstrap/Modal";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { bindActionCreators } from "redux";
@@ -21,9 +18,11 @@ import {
   withRouter,
 } from "react-router-dom";
 
-import LoginModals from "./Modals/LoginModals"
+import LoginModal from "./Modals/LoginModal"
+import RegisterModal from "./Modals/RegisterModal"
 
 class Headnav extends Component {
+
   constructor(props) {
     super(props);
     this.state = {
@@ -31,7 +30,6 @@ class Headnav extends Component {
       login: false,
     };
   }
-
   handleClose = () => {
     this.setState(() => ({
       register: false,
@@ -46,7 +44,8 @@ class Headnav extends Component {
   render() {
     return (
       <div className="container-fluid" style={{ padding: 0 }}>
-        <LoginModals show={this.state.login} handleClose={this.handleClose} />
+        <LoginModal show={this.state.login} handleClose={this.handleClose} />
+        <RegisterModal show={this.state.register} handleClose={this.handleClose}/>
         <Navbar bg="dark" expand="lg" variant="dark">
           <Link to="/">
             <Navbar.Brand> Job_Recruitment</Navbar.Brand>
@@ -84,8 +83,8 @@ class Headnav extends Component {
                   </Link>
                 </Nav>
                 <Nav>
-                  <Link onClick={this.handleLogOut} className="nav-link" to="/signout">
-                    Sign Out
+                  <Link onClick={this.handleLogOut} className="nav-link" to="/logout">
+                    Logout
                   </Link>
                 </Nav>
               </Nav>
@@ -98,7 +97,7 @@ class Headnav extends Component {
                       }));
                     }}>
                     <Link className="nav-link" to="/signup">
-                      Sign Up Now
+                      Register Now
                   </Link>
                   </Nav>
                   <Nav
@@ -142,6 +141,4 @@ function mapDispatchToProps(dispatch) {
   );
 }
 
-export default withRouter(
-  connect(mapStateToProps, mapDispatchToProps)(Headnav)
-);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Headnav));

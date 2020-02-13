@@ -7,8 +7,8 @@ import {
 const initialState = {
     id: localStorage.getItem("id"),
     username: localStorage.getItem("username"),
-    email: localStorage.getItem("email"),
-    token: localStorage.getItem("token")
+    token: localStorage.getItem("token"),
+    role: localStorage.getItem("role")
 };
 
 export default function (state = initialState, action) {
@@ -19,35 +19,34 @@ export default function (state = initialState, action) {
             localStorage.setItem("id", action.payload.id);
             localStorage.setItem("token", action.payload.token);
             localStorage.setItem("username", action.payload.username)
+            localStorage.setItem("role", action.payload.role)
             return {
                 ...state,
                 id: action.payload.id,
                 token: action.payload.token,
                 username: action.payload.username,
+                role: action.payload.role
             }
         case LOGIN_PROCESS:
             localStorage.setItem("id", action.payload.id);
             localStorage.setItem("token", action.payload.token);
             localStorage.setItem("username", action.payload.username)
-            localStorage.setItem("email", action.payload.email)
+            localStorage.setItem("role", action.payload.role)
             return {
                 ...state,
                 id: action.payload.id,
                 token: action.payload.token,
                 username: action.payload.username,
-                email: action.payload.email ? action.payload.email : ""
+                role: action.payload.role,
             }
         case LOGOUT_PROCESS:
-            localStorage.removeItem("id")
-            localStorage.removeItem("token")
-            localStorage.removeItem("username")
-            localStorage.removeItem("email")
+            localStorage.clear();
             return {
                 ...state,
                 id: "",
                 token: "",
                 username: "",
-                email: ""
+                role: ""
             }
     }
 }

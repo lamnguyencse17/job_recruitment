@@ -2,19 +2,33 @@ import React, { Component } from 'react';
 import InputGroup from 'react-bootstrap/InputGroup'
 import Button from 'react-bootstrap/Button'
 import FormControl from 'react-bootstrap/FormControl'
+import PropTypes from 'prop-types';
+import { connect } from "react-redux";
+import {
+    BrowserRouter as Router,
+    Switch,
+    Route,
+    Link,
+    useParams,
+    useRouteMatch,
+    Redirect,
+    withRouter,
+} from "react-router-dom";
+import Profile from './Profile/Profile';
 
 
 class Body extends Component {
-    constructor(){
+    constructor() {
         super()
-        this.textInput = React.createRef(); 
+        this.textInput = React.createRef();
     }
-    handleSearch(){
+    handleSearch() {
         // console.log(this.textInput.current.value)
         // Search function goes here
     }
     render() {
         return (
+            <div>
             <div className="row">
                 <div className="col-3"></div>
                 <div className="col">
@@ -27,8 +41,27 @@ class Body extends Component {
                 </div>
                 <div className="col-3"></div>
             </div>
+                <Switch>
+                    <Route path="/profile">
+                        <Profile/>
+                    </Route>
+                </Switch>
+            </div>
         );
     }
 }
 
-export default Body;
+Body.propTypes = {
+    token: PropTypes.string,
+    id: PropTypes.string
+}
+
+function mapStateToProps(state) {
+    return {
+        id: state.auth.id,
+        token: state.auth.token,
+    };
+}
+
+
+export default withRouter(connect(mapStateToProps, null)(Body));

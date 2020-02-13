@@ -42,11 +42,11 @@ router.use('/jobs', function(req, res, next){
 
 router.use('/profiles', function(req, res, next){
     let param = req.path.replace("/", "")
-    if (!paramValidate(req, param)){
+    if (!paramValidate(req, param) && req.method == "GET"){
         return res.status(400).json({ message: `${param} ID was invalid` })
     }
     next()
-}, require('./models/cvs'))
+}, require('./models/profiles'))
 
 function paramValidate(req, param){
     if (req.method != "GET" && ObjectId.isValid(param)) {

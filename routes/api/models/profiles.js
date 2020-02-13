@@ -24,13 +24,13 @@ router.get("/:profile_ID", async (req, res) => { // access own or other profile
 })
 
 router.post("/", async (req, res) => {
-    // body: profile_ID, detail: {name, dob, email, date}
+    // body: profile_ID, detail: {name, dob, email}
     mongo.connect(dataPath, async (err, client) => {
         if (err) {
             errorLog.writeLog(req.baseUrl, req.path, req.method, req.body, err)
             return res.status(400).json({ message: "Database system is not available" })
         } else {
-            let result = await postProfiles(client, req.body.profile_ID, req.body.detail)
+            let result = await postProfiles(client, req.user, req.body)
             return res.status(result.code).json(result.message ? result.message : result.info)
         }
     })
@@ -43,7 +43,7 @@ router.put("/", (req, res) => {
             errorLog.writeLog(req.baseUrl, req.path, req.method, req.body, err)
             return res.status(400).json({ message: "Database system is not available" })
         } else {
-            let result = await putProfiles(client, req.body.profile_ID, req.body.detail)
+            let result = await putProfiles(client, req.user, req.body)
             return res.status(result.code).json(result.message ? result.message : result.info)
         }
     })
@@ -62,7 +62,7 @@ router.delete("/", (req, res) => {
             if (validate.length == 0 || validate[0]._id != req.user) {
                 return res.status(401).json({ message: "Not authorized or profile_ID does not exist" })
             } else {
-                let result = await deleteProfiles(client, req.body.profile_ID, req.role)
+                let result = await deleteProfiles(client, req.user, req.role)
                 return res.status(result.code).json(result.message ? result.message : result.info)
             }
         }
@@ -96,7 +96,7 @@ async function postProfiles(client, profile_ID, detail) {
             $set: {
                 "name": detail.name,
                 "email": detail.email,
-                "dob": detail.date,
+                "dob": detail.dob,
             }
         })
     }

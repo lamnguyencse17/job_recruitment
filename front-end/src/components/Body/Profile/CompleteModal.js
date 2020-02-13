@@ -5,20 +5,21 @@ import FormControl from 'react-bootstrap/FormControl'
 import InputGroup from 'react-bootstrap/InputGroup'
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { loginProcess } from "../../../actions/auth";
+import { postProfile } from "../../../actions/profile";
 
 import PropTypes from 'prop-types';
 
-class LoginModals extends Component {
+class CompleteModal extends Component {
     constructor() {
         super()
-        this.username = React.createRef();
-        this.password = React.createRef();
+        this.email = React.createRef();
+        this.dob = React.createRef();
+        this.name = React.createRef();
     }
 
-    handleLogin = () => {
-        this.props.handleClose()
-        this.props.loginProcess(this.username.current.value, this.password.current.value)
+    handleSaveProfile = () => {
+        this.props.postProfile(this.name.current.value, this.name.current.value, this.dob.current.value, this.props.token)
+        this.props.hide()
     }
 
     render() {
@@ -30,21 +31,26 @@ class LoginModals extends Component {
                     </Modal.Header>
                     <Modal.Body>
                         <InputGroup.Prepend>
-                            <InputGroup.Text>Username</InputGroup.Text>
+                            <InputGroup.Text>Name</InputGroup.Text>
                         </InputGroup.Prepend>
                         <InputGroup className="mb-3">
-                            <FormControl ref={this.username} aria-describedby="basic-addon1" />
+                            <FormControl ref={this.dob} aria-describedby="basic-addon1" />
                         </InputGroup>
                         <InputGroup.Prepend>
-                            <InputGroup.Text>Password</InputGroup.Text>
+                            <InputGroup.Text>Date of Birth</InputGroup.Text>
                         </InputGroup.Prepend>
                         <InputGroup className="mb-3">
-                            <FormControl type="password" ref={this.password} aria-describedby="basic-addon1" />
+                            <FormControl ref={this.name} aria-describedby="basic-addon1" />
+                        </InputGroup>
+                        <InputGroup.Prepend>
+                            <InputGroup.Text>Email</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <InputGroup className="mb-3">
+                            <FormControl type="email" ref={this.email} aria-describedby="basic-addon1" />
                         </InputGroup>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button variant="primary" onClick={this.handleLogin}>Login</Button>
-                        <Button variant="secondary" onClick={this.props.handleClose}>Close</Button>
+                        <Button variant="primary" onClick={this.handleSaveProfile}>Save</Button>
                     </Modal.Footer>
                 </Modal>
             </div>
@@ -52,25 +58,24 @@ class LoginModals extends Component {
     }
 }
 
-LoginModals.propTypes = {
+CompleteModal.propTypes = {
     show: PropTypes.bool.isRequired,
-    handleClose: PropTypes.func.isRequired,
-    loginProcess: PropTypes.func.isRequired
+    postProfile: PropTypes.func.isRequired,
+    token: PropTypes.string.isRequired,
+    hide: PropTypes.func.isRequired
 }
 
 function mapStateToProps(state) {
     return {
-        email: state.auth.email,
         token: state.auth.token,
-        username: state.auth.username,
     };
 }
 
 function mapDispatchToProps(dispatch) {
     return bindActionCreators(
-        { loginProcess },
+        { postProfile },
         dispatch
     );
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(LoginModals);
+export default connect(mapStateToProps, mapDispatchToProps)(CompleteModal);
