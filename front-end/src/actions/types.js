@@ -1,5 +1,9 @@
 export const REGISTER_PROCESS = "REGISTER_PROCESS";
 export const LOGIN_PROCESS = "LOGIN_PROCESS";
 export const LOGOUT_PROCESS = "LOGOUT_PROCESS";
+export const AUTH_PROCESS = "AUTH_PROCESS";
 export const GET_PROFILE = "GET_PROFILE";
-export const POST_PROFILE = "POST_PROFILE"
+export const POST_PROFILE = "POST_PROFILE";
+export const PUT_PROFILE = "PUT_PROFILE";
+export const GET_ERRORS = "GET_ERRORS";
+export const CREATE_MESSAGE = "CREATE_MESSAGE"

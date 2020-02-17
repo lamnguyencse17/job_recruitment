@@ -37,7 +37,7 @@ router.post("/", async (req, res) => {
 })
 
 router.put("/", (req, res) => {
-    // body: profile_ID, detail: {name, dob, email, date}
+    // body: {name, dob, email, date}
     mongo.connect(dataPath, async (err, client) => {
         if (err) {
             errorLog.writeLog(req.baseUrl, req.path, req.method, req.body, err)
@@ -120,7 +120,7 @@ async function putProfiles(client, profile_ID, detail) {
     } else {
         db.updateOne({ _id: ObjectId(profile_ID) }, {
             $set: {
-                "name": detail.name ? name : info[0].name,
+                "name": detail.name ? detail.name : info[0].name,
                 "email": detail.email ? detail.email : info[0].email,
                 "dob": detail.date ? detail.date : info[0].dob
             }
@@ -128,6 +128,7 @@ async function putProfiles(client, profile_ID, detail) {
     }
     info = await db.find({ "_id": ObjectId(profile_ID) }).toArray()
     delete info[0].auth
+    delete info[0].cvs
     return { code: 200, info: info[0] }
 }
 

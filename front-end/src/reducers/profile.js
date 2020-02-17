@@ -1,4 +1,4 @@
-import { GET_PROFILE, POST_PROFILE } from "../actions/types";
+import { GET_PROFILE, POST_PROFILE, PUT_PROFILE } from "../actions/types";
 
 const initialState = {
     name: localStorage.getItem("name"),
@@ -23,6 +23,16 @@ export default function (state = initialState, action) {
                 email: action.payload.email ? action.payload.email : state.email,
                 dob: action.payload.dob ? action.payload.dob : state.dob,
                 cvs: action.payload.cvs ? action.payload.cvs : state.cvs
+            }
+        case PUT_PROFILE:
+            localStorage.setItem("name", action.payload.name)
+            localStorage.setItem("email", action.payload.email)
+            localStorage.setItem("dob", action.payload.dob)
+            return {
+                ...state,
+                name: action.payload.name ? action.payload.name : state.name,
+                email: action.payload.email ? action.payload.email : state.email,
+                dob: action.payload.dob ? action.payload.dob : state.dob,
             }
     }
 }

@@ -18,7 +18,7 @@ class CompleteModal extends Component {
     }
 
     handleSaveProfile = () => {
-        this.props.postProfile(this.name.current.value, this.name.current.value, this.dob.current.value, this.props.token)
+        this.props.postProfile(this.email.current.value, this.dob.current.value, this.name.current.value, this.props.token)
         this.props.hide()
     }
 

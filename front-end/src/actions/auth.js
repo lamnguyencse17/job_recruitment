@@ -4,7 +4,9 @@ import {
     REGISTER_PROCESS,
     LOGIN_PROCESS,
     LOGOUT_PROCESS,
+    AUTH_PROCESS
 } from "./types";
+import { createMessage, returnErrors } from './messages'
 
 export const loginProcess = (username, password) => async (dispatch) => {
     let result = await axios
@@ -24,7 +26,10 @@ export const loginProcess = (username, password) => async (dispatch) => {
             dispatch({ type: LOGIN_PROCESS, payload: res.data }); // payload: TOKEN + ID + username + email
             return {id: res.data.id, token: res.data.token}
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+            console.log(err)
+            dispatch(returnErrors(err.response.data, err.response.status))
+        });
     return result
 };
 
@@ -47,7 +52,10 @@ export const registerProcess = (username, password, role) => dispatch => {
                 res.data.role = role
                 dispatch({ type: REGISTER_PROCESS, payload: res.data }); // payload: TOKEN + ID + username
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+            console.log(err)
+            dispatch(returnErrors(err.response.data, err.response.status))
+        });
 };
 
 export const logoutProcess = (token) => dispatch => {
@@ -69,5 +77,29 @@ export const logoutProcess = (token) => dispatch => {
                 console.log(res.data)
             }
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+            console.log(err)
+            dispatch(returnErrors(err.response.data, err.response.status))
+        }); // Error would be Token expired
 };
+
+export const authProcess = (token) => dispatch => {
+    axios
+        .get(
+            'http://127.0.0.1:5000/api/auths/verify',
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-access-token": token 
+                },
+            }
+        )
+        .then(res => {
+            dispatch({ type: AUTH_PROCESS, payload: res.data }); // payload: id, role
+        })
+        .catch(err => {
+            console.log(err)
+            dispatch({ type: LOGOUT_PROCESS, payload: true})
+            dispatch(createMessage("Logged Out!"))
+        });
+}

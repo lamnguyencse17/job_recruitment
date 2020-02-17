@@ -1,7 +1,8 @@
 import {
     REGISTER_PROCESS,
     LOGIN_PROCESS,
-    LOGOUT_PROCESS
+    LOGOUT_PROCESS,
+    AUTH_PROCESS
 } from "../actions/types";
 
 const initialState = {
@@ -48,5 +49,14 @@ export default function (state = initialState, action) {
                 username: "",
                 role: ""
             }
+        case AUTH_PROCESS:
+            localStorage.setItem("id", action.payload.id);
+            localStorage.setItem("role", action.payload.role);
+            return {
+                ...state,
+                id: action.payload.id,
+                role: action.payload.role,
+            }
+
     }
 }

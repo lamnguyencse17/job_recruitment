@@ -22,4 +22,11 @@ router.use('/logout', function(req, res, next){
     next()
 }, require('./auths/logout'))
 
+router.use('/verify', function(req, res, next){
+    if (req.method != "GET"){
+        return res.status(400).json({message: "Request not allowed"})
+    }
+    next()
+}, require('./auths/verify'))
+
 module.exports = router;

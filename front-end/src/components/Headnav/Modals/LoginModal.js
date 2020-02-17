@@ -23,7 +23,6 @@ class LoginModal extends Component {
     handleLogin = async () => {
         this.props.handleClose()
         let result = await this.props.loginProcess(this.username.current.value, this.password.current.value)
-        console.log(result)
         this.props.getProfile(result.id, result.token)
         this.props.history.push("/")
     }
@@ -63,7 +62,8 @@ LoginModal.propTypes = {
     show: PropTypes.bool.isRequired,
     handleClose: PropTypes.func.isRequired,
     loginProcess: PropTypes.func.isRequired,
-    getProfile: PropTypes.func.isRequired
+    getProfile: PropTypes.func.isRequired,
+    history: PropTypes.object.isRequired
 }
 
 function mapDispatchToProps(dispatch) {
