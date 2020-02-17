@@ -1,26 +1,39 @@
 import React, { Component } from 'react';
-import Modal from 'react-bootstrap/Modal'
-import Button from 'react-bootstrap/Button'
-import FormControl from 'react-bootstrap/FormControl'
-import InputGroup from 'react-bootstrap/InputGroup'
+import PropTypes from 'prop-types';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
+import FormControl from 'react-bootstrap/FormControl';
+import InputGroup from 'react-bootstrap/InputGroup';
+
+
+import Popup from '../../Common/Popup';
+import { verifyProcess } from "../../../actions/auth";
+import { setErrors, clearErrors } from "../../../actions/errors";
+
+
 class DeleteModal extends Component {
-    constructor(){
-        super()
+    constructor() {
+        super();
         this.password = React.createRef();
         this.confirm = React.createRef();
     }
     handleDelete = () => {
-        if (this.confirm.current.value != "I Confirm"){
-            console.log("HELL NO")
+        if (this.confirm.current.value != "I Confirm") {
+            this.props.setErrors("Please enter correctly the phrase", 0);
         }
-    }
+        if (this.props.popup) {
+            this.props.clearErrors();
+        }
+        this.props.verifyProcess(this.props.token, this.password.current.value);
+    };
     render() {
         return (
             <div>
                 <Modal show={this.props.show}>
+                    <Popup />
                     <Modal.Header>
                         <Modal.Title>Deletion Of Your Account</Modal.Title>
                     </Modal.Header>
@@ -48,4 +61,28 @@ class DeleteModal extends Component {
     }
 }
 
-export default DeleteModal;
+DeleteModal.propTypes = {
+    token: PropTypes.string.isRequired,
+    show: PropTypes.bool.isRequired,
+    popup: PropTypes.bool.isRequired,
+    toggleDeleteModal: PropTypes.func.isRequired,
+    verifyProcess: PropTypes.func.isRequired,
+    clearErrors: PropTypes.func.isRequired,
+    setErrors: PropTypes.func.isRequired
+};
+
+function mapStateToProps(state) {
+    return {
+        token: state.auth.token,
+        popup: state.errors.show,
+    };
+}
+
+function mapDispatchToProps(dispatch) {
+    return bindActionCreators(
+        { verifyProcess, clearErrors, setErrors },
+        dispatch
+    );
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(DeleteModal); 

@@ -1,25 +1,17 @@
 import React, { Component } from "react";
+import PropTypes from "prop-types";
+
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
+
 import { connect } from "react-redux";
-import PropTypes from "prop-types";
 import { bindActionCreators } from "redux";
+import { Link, withRouter } from "react-router-dom";
 
-import {logoutProcess} from "../../actions/auth"
+import { logoutProcess } from "../../actions/auth";
 
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link,
-  useParams,
-  useRouteMatch,
-  Redirect,
-  withRouter,
-} from "react-router-dom";
-
-import LoginModal from "./Modals/LoginModal"
-import RegisterModal from "./Modals/RegisterModal"
+import LoginModal from "./Modals/LoginModal";
+import RegisterModal from "./Modals/RegisterModal";
 
 class Headnav extends Component {
 
@@ -31,21 +23,21 @@ class Headnav extends Component {
     };
   }
   handleClose = () => {
-    this.setState(() => ({
+    this.setState({
       register: false,
       login: false,
-    }));
-  }
+    });
+  };
 
   handleLogOut = () => {
-    this.props.logoutProcess(this.props.token)
-  }
+    this.props.logoutProcess(this.props.token);
+  };
 
   render() {
     return (
       <div className="container-fluid" style={{ padding: 0 }}>
         <LoginModal show={this.state.login} handleClose={this.handleClose} />
-        <RegisterModal show={this.state.register} handleClose={this.handleClose}/>
+        <RegisterModal show={this.state.register} handleClose={this.handleClose} />
         <Navbar bg="dark" expand="lg" variant="dark">
           <Link to="/">
             <Navbar.Brand> Job_Recruitment</Navbar.Brand>
@@ -92,21 +84,20 @@ class Headnav extends Component {
                 <Nav>
                   <Nav
                     onClick={() => {
-                      this.setState(state => ({
+                      this.setState({
+                        ...this.state,
                         register: true,
-                      }));
+                      });
                     }}>
                     <Link className="nav-link" to="/signup">
                       Register Now
                   </Link>
                   </Nav>
-                  <Nav
-                    href="#login"
-                    onClick={() => {
-                      this.setState(state => ({
-                        login: true,
-                      }));
-                    }}>
+                  <Nav href="#login" onClick={() => {
+                    this.setState({
+                      ...this.state, login: true,
+                    });
+                  }}>
                     <Link className="nav-link" to="/login">
                       Login
                   </Link>
@@ -123,7 +114,7 @@ class Headnav extends Component {
 Headnav.propTypes = {
   token: PropTypes.string,
   logoutProcess: PropTypes.func.isRequired
-}
+};
 
 function mapStateToProps(state) {
   return {

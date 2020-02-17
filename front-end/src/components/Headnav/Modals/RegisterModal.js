@@ -1,36 +1,44 @@
 import React, { Component } from 'react';
-import Modal from 'react-bootstrap/Modal'
-import Button from 'react-bootstrap/Button'
-import FormControl from 'react-bootstrap/FormControl'
-import InputGroup from 'react-bootstrap/InputGroup'
-import DropdownButton from 'react-bootstrap/DropdownButton'
-import Dropdown from 'react-bootstrap/Dropdown'
+import PropTypes from 'prop-types';
+
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { registerProcess } from "../../../actions/auth";
-import {
-    withRouter,
-  } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 
-import PropTypes from 'prop-types';
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
+import FormControl from 'react-bootstrap/FormControl';
+import InputGroup from 'react-bootstrap/InputGroup';
+import DropdownButton from 'react-bootstrap/DropdownButton';
+import Dropdown from 'react-bootstrap/Dropdown';
+
+import { registerProcess } from "../../../actions/auth";
+import { clearErrors } from "../../../actions/errors";
+
 
 class RegisterModal extends Component {
     constructor() {
-        super()
+        super();
         this.state = {
             role: ""
-        }
+        };
         this.username = React.createRef();
         this.password = React.createRef();
     }
     roleSelect = (role) => {
-        this.setState({...this.state, role: role})
-    }
-    handleRegister = () => {
-        this.props.handleClose()    
-        this.props.registerProcess(this.username.current.value, this.password.current.value, this.state.role)
-        this.props.history.push('/profile')
-    }
+        this.setState({ ...this.state, role: role });
+    };
+    handleRegister = async () => {
+        if (this.props.popup) {
+            this.props.clearErrors();
+        }
+        this.props.handleClose();
+        let result = await this.props.registerProcess(this.username.current.value, this.password.current.value, this.state.role);
+        if (result) {
+            this.props.history.push('/profile');
+            return;
+        }
+    };
 
     render() {
         return (
@@ -50,8 +58,8 @@ class RegisterModal extends Component {
                                 variant="outline-secondary"
                                 title="Register as"
                                 id="input-group-dropdown-2">
-                                <Dropdown.Item onSelect={() => {this.roleSelect(1)}}>An Employee</Dropdown.Item>
-                                <Dropdown.Item onSelect={() => {this.roleSelect(2)}}>A Recruiter</Dropdown.Item>
+                                <Dropdown.Item onSelect={() => { this.roleSelect(1); }}>An Employee</Dropdown.Item>
+                                <Dropdown.Item onSelect={() => { this.roleSelect(2); }}>A Recruiter</Dropdown.Item>
                             </DropdownButton>
                         </InputGroup>
                         <InputGroup.Prepend>
@@ -75,14 +83,22 @@ RegisterModal.propTypes = {
     show: PropTypes.bool.isRequired,
     handleClose: PropTypes.func.isRequired,
     registerProcess: PropTypes.func.isRequired,
-    history: PropTypes.object
+    history: PropTypes.object,
+    popup: PropTypes.bool.isRequired,
+    clearErrors: PropTypes.func.isRequired
+};
+
+function mapStateToProps(state) {
+    return {
+        popup: state.errors.show,
+    };
 }
 
 function mapDispatchToProps(dispatch) {
     return bindActionCreators(
-        { registerProcess },
+        { registerProcess, clearErrors },
         dispatch
     );
 }
 
-export default withRouter(connect(null, mapDispatchToProps)(RegisterModal));
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(RegisterModal));

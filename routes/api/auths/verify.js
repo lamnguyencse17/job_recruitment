@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken')
 const config = require('../../../env/config')
 const dataPath = 'mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority'
 const errorLog = require('../../../logging/modules/errorLog')
-
+const bcrypt = require('bcryptjs')
 
 
 router.get('/', (req, res) => {
@@ -35,6 +35,23 @@ router.get('/', (req, res) => {
                 }
             })
         }
+    })
+})
+router.post('/', (req, res) => {
+    mongo.connect(dataPath, async (err, client) => {
+        if (err) {
+            errorLog.writeLog(req.baseUrl, req.path, req.method, req.body, err)
+            return res.status(400).json({ message: "Database system is not available" })
+        }
+        let info = await client.db('job_recruitment').collection('profiles').find({ "_id": ObjectId(req.user) }).toArray();
+            if (info.length == 0) {
+                res.status(400).json({ message: "Username does not exist" })
+            } else {
+                if (bcrypt.compareSync(req.body.password, info[0].auth.password)){
+                    return res.status(200).json({message: "Verified"})
+                }
+                return res.status(401).json({message: "Not Verified"})
+            }
     })
 })
 module.exports = router;

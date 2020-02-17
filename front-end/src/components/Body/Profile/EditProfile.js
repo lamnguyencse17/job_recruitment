@@ -1,41 +1,43 @@
 import React, { Component, Fragment } from 'react';
-import FormControl from 'react-bootstrap/FormControl'
-import Form from 'react-bootstrap/Form'
-import Button from 'react-bootstrap/Button'
+import PropTypes from 'prop-types';
+
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
-import PropTypes from 'prop-types';
+
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+
 import { putProfile } from "../../../actions/profile";
 
 class EditProfile extends Component {
     constructor() {
-        super()
+        super();
         this.state = {
             name: true,
             email: true,
             dob: true
-        }
+        };
         this.email = React.createRef();
         this.dob = React.createRef();
         this.name = React.createRef();
     }
     toggleEdit = () => {
-        this.setState({ [event.target.id]: !(this.state[event.target.id]) })
-    }
+        this.setState({ [event.target.id]: !(this.state[event.target.id]) });
+    };
     saveChanges = () => {
         if (this.email.current.value == this.props.email ||
             this.name.current.value == this.props.name ||
             this.dob.current.value == this.props.dob) {
-                console.log("NOTHING HAPPENED")
-                return
+            console.log("NOTHING HAPPENED");
+            return;
         }
-        this.props.putProfile(this.email.current.value, this.dob.current.value, this.name.current.value, this.props.token)
+        this.props.putProfile(this.email.current.value, this.dob.current.value, this.name.current.value, this.props.token);
         this.setState({
             name: true,
             email: true,
             dob: true
-        })
-    }
+        });
+    };
     render() {
         return (
             <Fragment>
@@ -62,7 +64,7 @@ class EditProfile extends Component {
                             <div className="col-2"><Button variant="warning" id="dob" onClick={() => this.toggleEdit()}>Edit</Button></div>
                         </Form.Row>
                     </Form.Group>
-                    <Button variant="primary" onClick={() => this.saveChanges()}>Save Changes</Button> 
+                    <Button variant="primary" onClick={() => this.saveChanges()}>Save Changes</Button>
                 </Form>
             </Fragment>
         );
@@ -75,7 +77,7 @@ EditProfile.propTypes = {
     dob: PropTypes.string.isRequired,
     token: PropTypes.string.isRequired,
     putProfile: PropTypes.func.isRequired
-}
+};
 
 function mapStateToProps(state) {
     return {

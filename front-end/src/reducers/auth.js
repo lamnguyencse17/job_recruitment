@@ -2,7 +2,8 @@ import {
     REGISTER_PROCESS,
     LOGIN_PROCESS,
     LOGOUT_PROCESS,
-    AUTH_PROCESS
+    AUTH_PROCESS,
+    VERIFY_PROCESS
 } from "../actions/types";
 
 const initialState = {
@@ -19,27 +20,27 @@ export default function (state = initialState, action) {
         case REGISTER_PROCESS:
             localStorage.setItem("id", action.payload.id);
             localStorage.setItem("token", action.payload.token);
-            localStorage.setItem("username", action.payload.username)
-            localStorage.setItem("role", action.payload.role)
+            localStorage.setItem("username", action.payload.username);
+            localStorage.setItem("role", action.payload.role);
             return {
                 ...state,
                 id: action.payload.id,
                 token: action.payload.token,
                 username: action.payload.username,
                 role: action.payload.role
-            }
+            };
         case LOGIN_PROCESS:
             localStorage.setItem("id", action.payload.id);
             localStorage.setItem("token", action.payload.token);
-            localStorage.setItem("username", action.payload.username)
-            localStorage.setItem("role", action.payload.role)
+            localStorage.setItem("username", action.payload.username);
+            localStorage.setItem("role", action.payload.role);
             return {
                 ...state,
                 id: action.payload.id,
                 token: action.payload.token,
                 username: action.payload.username,
                 role: action.payload.role,
-            }
+            };
         case LOGOUT_PROCESS:
             localStorage.clear();
             return {
@@ -48,7 +49,7 @@ export default function (state = initialState, action) {
                 token: "",
                 username: "",
                 role: ""
-            }
+            };
         case AUTH_PROCESS:
             localStorage.setItem("id", action.payload.id);
             localStorage.setItem("role", action.payload.role);
@@ -56,7 +57,8 @@ export default function (state = initialState, action) {
                 ...state,
                 id: action.payload.id,
                 role: action.payload.role,
-            }
-
+            };
+        case VERIFY_PROCESS:
+            return state;
     }
 }

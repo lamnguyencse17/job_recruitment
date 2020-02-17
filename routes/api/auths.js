@@ -23,7 +23,7 @@ router.use('/logout', function(req, res, next){
 }, require('./auths/logout'))
 
 router.use('/verify', function(req, res, next){
-    if (req.method != "GET"){
+    if (req.method == "PUT" || req.method == "DELETE"){
         return res.status(400).json({message: "Request not allowed"})
     }
     next()

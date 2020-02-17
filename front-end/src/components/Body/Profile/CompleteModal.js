@@ -1,26 +1,30 @@
 import React, { Component } from 'react';
-import Modal from 'react-bootstrap/Modal'
-import Button from 'react-bootstrap/Button'
-import FormControl from 'react-bootstrap/FormControl'
-import InputGroup from 'react-bootstrap/InputGroup'
+import PropTypes from 'prop-types';
+
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
+
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
+import FormControl from 'react-bootstrap/FormControl';
+import InputGroup from 'react-bootstrap/InputGroup';
+
 import { postProfile } from "../../../actions/profile";
 
-import PropTypes from 'prop-types';
+
 
 class CompleteModal extends Component {
     constructor() {
-        super()
+        super();
         this.email = React.createRef();
         this.dob = React.createRef();
         this.name = React.createRef();
     }
 
     handleSaveProfile = () => {
-        this.props.postProfile(this.email.current.value, this.dob.current.value, this.name.current.value, this.props.token)
-        this.props.hide()
-    }
+        this.props.postProfile(this.email.current.value, this.dob.current.value, this.name.current.value, this.props.token);
+        this.props.hide();
+    };
 
     render() {
         return (
@@ -63,7 +67,7 @@ CompleteModal.propTypes = {
     postProfile: PropTypes.func.isRequired,
     token: PropTypes.string.isRequired,
     hide: PropTypes.func.isRequired
-}
+};
 
 function mapStateToProps(state) {
     return {

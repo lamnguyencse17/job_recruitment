@@ -4,9 +4,10 @@ import {
     REGISTER_PROCESS,
     LOGIN_PROCESS,
     LOGOUT_PROCESS,
-    AUTH_PROCESS
+    AUTH_PROCESS,
+    VERIFY_PROCESS
 } from "./types";
-import { createMessage, returnErrors } from './messages'
+import { setErrors } from './errors';
 
 export const loginProcess = (username, password) => async (dispatch) => {
     let result = await axios
@@ -24,17 +25,18 @@ export const loginProcess = (username, password) => async (dispatch) => {
         )
         .then(res => {
             dispatch({ type: LOGIN_PROCESS, payload: res.data }); // payload: TOKEN + ID + username + email
-            return {id: res.data.id, token: res.data.token}
+            return { id: res.data.id, token: res.data.token };
         })
         .catch(err => {
-            console.log(err)
-            dispatch(returnErrors(err.response.data, err.response.status))
+            console.log(err);
+            dispatch(setErrors(err.response.data.message, err.response.status));
+            return false;
         });
-    return result
+    return result;
 };
 
-export const registerProcess = (username, password, role) => dispatch => {
-    axios
+export const registerProcess = (username, password, role) => async dispatch => {
+    let result = await axios
         .post(
             "http://127.0.0.1:5000/api/auths/register",
             {
@@ -49,13 +51,16 @@ export const registerProcess = (username, password, role) => dispatch => {
             }
         )
         .then(res => {
-                res.data.role = role
-                dispatch({ type: REGISTER_PROCESS, payload: res.data }); // payload: TOKEN + ID + username
+            res.data.role = role;
+            dispatch({ type: REGISTER_PROCESS, payload: res.data }); // payload: TOKEN + ID + username
+            return true;
         })
         .catch(err => {
-            console.log(err)
-            dispatch(returnErrors(err.response.data, err.response.status))
+            console.log(err);
+            dispatch(setErrors(err.response.data, err.response.status));
+            return false;
         });
+    return result;
 };
 
 export const logoutProcess = (token) => dispatch => {
@@ -66,20 +71,20 @@ export const logoutProcess = (token) => dispatch => {
             {
                 headers: {
                     "Content-Type": "application/json",
-                    "x-access-token": token 
+                    "x-access-token": token
                 },
             }
         )
         .then(res => {
-            if (res.status == 200){
+            if (res.status == 200) {
                 dispatch({ type: LOGOUT_PROCESS, payload: true }); // is not needed
             } else {
-                console.log(res.data)
+                console.log(res.data);
             }
         })
         .catch(err => {
-            console.log(err)
-            dispatch(returnErrors(err.response.data, err.response.status))
+            console.log(err);
+            dispatch(setErrors(err.response.data, err.response.status));
         }); // Error would be Token expired
 };
 
@@ -90,7 +95,7 @@ export const authProcess = (token) => dispatch => {
             {
                 headers: {
                     "Content-Type": "application/json",
-                    "x-access-token": token 
+                    "x-access-token": token
                 },
             }
         )
@@ -98,8 +103,30 @@ export const authProcess = (token) => dispatch => {
             dispatch({ type: AUTH_PROCESS, payload: res.data }); // payload: id, role
         })
         .catch(err => {
-            console.log(err)
-            dispatch({ type: LOGOUT_PROCESS, payload: true})
-            dispatch(createMessage("Logged Out!"))
+            console.log(err);
+            dispatch({ type: LOGOUT_PROCESS, payload: true });
         });
-}
+};
+
+export const verifyProcess = (token, password) => dispatch => {
+    axios
+        .post(
+            'http://127.0.0.1:5000/api/auths/verify',
+            {
+                password: password
+            },
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-access-token": token
+                },
+            }
+        )
+        .then(() => {
+            dispatch({ type: VERIFY_PROCESS, payload: true }); // payload: id, role
+        })
+        .catch(err => {
+            console.log(err);
+            dispatch(setErrors("Wrong password", 401));
+        });
+};

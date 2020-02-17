@@ -1,36 +1,48 @@
 import React, { Component } from 'react';
-import Modal from 'react-bootstrap/Modal'
-import Button from 'react-bootstrap/Button'
-import FormControl from 'react-bootstrap/FormControl'
-import InputGroup from 'react-bootstrap/InputGroup'
+import PropTypes from 'prop-types';
+
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { loginProcess } from "../../../actions/auth";
-import { getProfile } from "../../../actions/profile"
-import {
-    withRouter,
-  } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 
-import PropTypes from 'prop-types';
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
+import FormControl from 'react-bootstrap/FormControl';
+import InputGroup from 'react-bootstrap/InputGroup';
+
+import Popup from "../../Common/Popup";
+
+import { loginProcess } from "../../../actions/auth";
+import { getProfile } from "../../../actions/profile";
+import { clearErrors } from "../../../actions/errors";
+
+
 
 class LoginModal extends Component {
     constructor() {
-        super()
+        super();
         this.username = React.createRef();
         this.password = React.createRef();
     }
 
     handleLogin = async () => {
-        this.props.handleClose()
-        let result = await this.props.loginProcess(this.username.current.value, this.password.current.value)
-        this.props.getProfile(result.id, result.token)
-        this.props.history.push("/")
-    }
+        if (this.props.popup) {
+            this.props.clearErrors();
+        }
+        let result = await this.props.loginProcess(this.username.current.value, this.password.current.value);
+        if (result) {
+            this.props.handleClose();
+            this.props.getProfile(result.id, result.token);
+            this.props.history.push("/");
+            return;
+        }
+    };
 
     render() {
         return (
             <div>
                 <Modal show={this.props.show}>
+                    <Popup />
                     <Modal.Header>
                         <Modal.Title>Login</Modal.Title>
                     </Modal.Header>
@@ -63,14 +75,22 @@ LoginModal.propTypes = {
     handleClose: PropTypes.func.isRequired,
     loginProcess: PropTypes.func.isRequired,
     getProfile: PropTypes.func.isRequired,
-    history: PropTypes.object.isRequired
+    history: PropTypes.object.isRequired,
+    clearErrors: PropTypes.func.isRequired,
+    popup: PropTypes.bool.isRequired
+};
+
+function mapStateToProps(state) {
+    return {
+        popup: state.errors.show,
+    };
 }
 
 function mapDispatchToProps(dispatch) {
     return bindActionCreators(
-        { loginProcess, getProfile },
+        { loginProcess, getProfile, clearErrors },
         dispatch
     );
 }
 
-export default withRouter(connect(null, mapDispatchToProps)(LoginModal));
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(LoginModal));

@@ -1,25 +1,19 @@
 import React, { Component } from 'react';
-import InputGroup from 'react-bootstrap/InputGroup'
-import Button from 'react-bootstrap/Button'
-import FormControl from 'react-bootstrap/FormControl'
 import PropTypes from 'prop-types';
+
 import { connect } from "react-redux";
-import {
-    BrowserRouter as Router,
-    Switch,
-    Route,
-    Link,
-    useParams,
-    useRouteMatch,
-    Redirect,
-    withRouter,
-} from "react-router-dom";
+import { Switch, Route, withRouter, } from "react-router-dom";
+
+import InputGroup from 'react-bootstrap/InputGroup';
+import Button from 'react-bootstrap/Button';
+import FormControl from 'react-bootstrap/FormControl';
+
 import Profile from './Profile/Profile';
 
 
 class Body extends Component {
     constructor() {
-        super()
+        super();
         this.textInput = React.createRef();
     }
     handleSearch() {
@@ -29,21 +23,21 @@ class Body extends Component {
     render() {
         return (
             <div>
-            <div className="row">
-                <div className="col-3"></div>
-                <div className="col">
-                    <InputGroup className="mb-3">
-                        <FormControl ref={this.textInput} aria-describedby="basic-addon1" />
-                        <InputGroup.Append>
-                            <Button onClick={() => this.handleSearch()} variant="outline-secondary">Search</Button>
-                        </InputGroup.Append>
-                    </InputGroup>
+                <div className="row">
+                    <div className="col-3"></div>
+                    <div className="col">
+                        <InputGroup className="mb-3">
+                            <FormControl ref={this.textInput} aria-describedby="basic-addon1" />
+                            <InputGroup.Append>
+                                <Button onClick={() => this.handleSearch()} variant="outline-secondary">Search</Button>
+                            </InputGroup.Append>
+                        </InputGroup>
+                    </div>
+                    <div className="col-3"></div>
                 </div>
-                <div className="col-3"></div>
-            </div>
                 <Switch>
                     <Route path="/profile">
-                        <Profile/>
+                        <Profile />
                     </Route>
                 </Switch>
             </div>
@@ -54,7 +48,7 @@ class Body extends Component {
 Body.propTypes = {
     token: PropTypes.string,
     id: PropTypes.string
-}
+};
 
 function mapStateToProps(state) {
     return {
@@ -62,6 +56,5 @@ function mapStateToProps(state) {
         token: state.auth.token,
     };
 }
-
 
 export default withRouter(connect(mapStateToProps, null)(Body));
