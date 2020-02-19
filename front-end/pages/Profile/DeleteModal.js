@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import Router from "next/router"
+
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 
@@ -9,9 +11,10 @@ import FormControl from 'react-bootstrap/FormControl';
 import InputGroup from 'react-bootstrap/InputGroup';
 
 
-import Popup from '../../Common/Popup';
-import { verifyProcess } from "../../../actions/auth";
-import { setErrors, clearErrors } from "../../../actions/errors";
+import Popup from '../Common/Popup';
+import {deleteProfile} from "../actions/profile"
+import { verifyProcess } from "../actions/auth";
+import { setErrors, clearErrors } from "../actions/errors";
 
 
 class DeleteModal extends Component {
@@ -20,7 +23,7 @@ class DeleteModal extends Component {
         this.password = React.createRef();
         this.confirm = React.createRef();
     }
-    handleDelete = () => {
+    handleDelete = async () => {
         if (this.confirm.current.value != "I Confirm") {
             this.props.setErrors("Please enter correctly the phrase", 0);
         }
@@ -28,6 +31,11 @@ class DeleteModal extends Component {
             this.props.clearErrors();
         }
         this.props.verifyProcess(this.props.token, this.password.current.value);
+        let result = await this.props.deleteProfile(this.props.token)
+        if (result) {
+            Router.push("/");
+            return;
+        }
     };
     render() {
         return (
@@ -66,6 +74,7 @@ DeleteModal.propTypes = {
     show: PropTypes.bool.isRequired,
     popup: PropTypes.bool.isRequired,
     toggleDeleteModal: PropTypes.func.isRequired,
+    deleteProfile: PropTypes.func.isRequired,
     verifyProcess: PropTypes.func.isRequired,
     clearErrors: PropTypes.func.isRequired,
     setErrors: PropTypes.func.isRequired
@@ -80,7 +89,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return bindActionCreators(
-        { verifyProcess, clearErrors, setErrors },
+        { deleteProfile, verifyProcess, clearErrors, setErrors },
         dispatch
     );
 }

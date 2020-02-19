@@ -2,13 +2,10 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import { connect } from "react-redux";
-import { Switch, Route, withRouter, } from "react-router-dom";
 
 import InputGroup from 'react-bootstrap/InputGroup';
 import Button from 'react-bootstrap/Button';
 import FormControl from 'react-bootstrap/FormControl';
-
-import Profile from './Profile/Profile';
 
 
 class Body extends Component {
@@ -35,11 +32,14 @@ class Body extends Component {
                     </div>
                     <div className="col-3"></div>
                 </div>
-                <Switch>
+                {/* <Switch>
                     <Route path="/profile">
                         <Profile />
                     </Route>
-                </Switch>
+                    <Route path="/companies/:id">
+                       <Companies/>
+                    </Route>
+                </Switch> */}
             </div>
         );
     }
@@ -57,4 +57,5 @@ function mapStateToProps(state) {
     };
 }
 
-export default withRouter(connect(mapStateToProps, null)(Body));
+export default connect(mapStateToProps, null)(Body);
+// export default withRouter(connect(mapStateToProps, null)(Body));

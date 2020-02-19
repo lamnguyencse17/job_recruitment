@@ -4,20 +4,22 @@ import PropTypes from "prop-types";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 
+import Link from 'next/link';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { Link, withRouter } from "react-router-dom";
 
-import { logoutProcess } from "../../actions/auth";
+import { logoutProcess } from "../actions/auth";
 
 import LoginModal from "./Modals/LoginModal";
 import RegisterModal from "./Modals/RegisterModal";
+import Router from "next/router";
 
 class Headnav extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
+      mounted: false,
       register: false,
       login: false,
     };
@@ -30,54 +32,59 @@ class Headnav extends Component {
   };
 
   handleLogOut = () => {
+
     this.props.logoutProcess(this.props.token);
+    Router.push("/")
   };
 
+  componentDidMount(){
+    this.setState({...this.state, mounted: true})
+    console.log(this.props)
+  }
+
   render() {
-    return (
+    return (this.state.mounted ? (
       <div className="container-fluid" style={{ padding: 0 }}>
         <LoginModal show={this.state.login} handleClose={this.handleClose} />
         <RegisterModal show={this.state.register} handleClose={this.handleClose} />
         <Navbar bg="dark" expand="lg" variant="dark">
-          <Link to="/">
+          <Link href="/">
             <Navbar.Brand> Job_Recruitment</Navbar.Brand>
           </Link>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="mr-auto">
               <Nav>
-                <Link className="nav-link" to="/">
-                  Home
+                <Link href="/">
+                <a className="nav-link">Home</a>
                 </Link>
               </Nav>
               <Nav>
-                <Link className="nav-link" to="/jobs">
-                  All Jobs
+                <Link href="/jobs">
+                <a className="nav-link">All Jobs</a>
                 </Link>
               </Nav>
 
               <Nav>
-                <Link className="nav-link" to="/companies">
-                  Companies
+                <Link href="/companies/1">
+                <a className="nav-link">Companies</a>
                 </Link>
               </Nav>
               <Nav>
-                <Link className="nav-link" to="/posts">
-                  Posts
+                <Link href="/posts">
+                <a className="nav-link">Posts</a>
                 </Link>
               </Nav>
             </Nav>
-            {this.props.token ? (
+            {this.props.token != "null" ? (
               <Nav>
                 <Nav>
-                  <Link className="nav-link" to="/profile">
-                    Profile
+                  <Link href="/profile">
+                  <a className="nav-link">Profile</a>
                   </Link>
                 </Nav>
-                <Nav>
-                  <Link onClick={this.handleLogOut} className="nav-link" to="/logout">
-                    Logout
-                  </Link>
+                <Nav onClick={this.handleLogOut}>
+                  <a  className="nav-link">Logout</a>
                 </Nav>
               </Nav>
             ) : (
@@ -89,24 +96,20 @@ class Headnav extends Component {
                         register: true,
                       });
                     }}>
-                    <Link className="nav-link" to="/signup">
-                      Register Now
-                  </Link>
+                      <a className="nav-link">Register Now</a>
                   </Nav>
-                  <Nav href="#login" onClick={() => {
+                  <Nav onClick={() => {
                     this.setState({
                       ...this.state, login: true,
                     });
                   }}>
-                    <Link className="nav-link" to="/login">
-                      Login
-                  </Link>
+                    <a className="nav-link">Login</a>
                   </Nav>
                 </Nav>
               )}
           </Navbar.Collapse>
         </Navbar>
-      </div>
+      </div>) : <div></div>
     );
   }
 }
@@ -132,4 +135,4 @@ function mapDispatchToProps(dispatch) {
   );
 }
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Headnav));
+export default connect(mapStateToProps, mapDispatchToProps)(Headnav)

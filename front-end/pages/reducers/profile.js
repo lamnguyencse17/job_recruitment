@@ -1,16 +1,22 @@
-import { GET_PROFILE, POST_PROFILE, PUT_PROFILE } from "../actions/types";
+import { GET_PROFILE, POST_PROFILE, PUT_PROFILE, DELETE_PROFILE, SET_PROFILE } from "../actions/types";
 
 const initialState = {
-    name: localStorage.getItem("name"),
-    email: localStorage.getItem("email"),
-    dob: localStorage.getItem("dob"),
-    cvs: localStorage.getItem("cvs")
+    name: "",
+    email: "",
+    dob: "",
+    cvs: ""
 };
 
 export default function (state = initialState, action) {
     switch (action.type) {
         default:
             return state;
+        case SET_PROFILE:
+            localStorage.setItem("name", action.payload.name);
+            localStorage.setItem("email", action.payload.email);
+            localStorage.setItem("dob", action.payload.dob);
+            localStorage.setItem("cvs", action.payload.cvs);
+            return action.payload
         case GET_PROFILE:
         case POST_PROFILE:
             localStorage.setItem("name", action.payload.name);
@@ -33,6 +39,14 @@ export default function (state = initialState, action) {
                 name: action.payload.name ? action.payload.name : state.name,
                 email: action.payload.email ? action.payload.email : state.email,
                 dob: action.payload.dob ? action.payload.dob : state.dob,
+            };
+        case DELETE_PROFILE:
+            localStorage.clear();
+            return {
+                name: "",
+                email: "",
+                dob: "",
+                cvs: []
             };
     }
 }

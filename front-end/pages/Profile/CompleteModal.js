@@ -9,7 +9,7 @@ import Button from 'react-bootstrap/Button';
 import FormControl from 'react-bootstrap/FormControl';
 import InputGroup from 'react-bootstrap/InputGroup';
 
-import { postProfile } from "../../../actions/profile";
+import { postProfile } from "../actions/profile";
 
 
 

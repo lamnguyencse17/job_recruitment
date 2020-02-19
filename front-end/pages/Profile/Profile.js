@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from "redux";
-import { getProfile } from "../../../actions/profile";
-import { authProcess } from "../../../actions/auth";
+import { getProfile } from "../actions/profile";
+import { authProcess } from "../actions/auth";
 import { connect } from "react-redux";
 import PropTypes from 'prop-types';
 import Tabs from "react-bootstrap/Tabs";
@@ -99,4 +99,4 @@ function mapDispatchToProps(dispatch) {
     );
 }
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Profile));
+export default connect(mapStateToProps, mapDispatchToProps)(Profile);

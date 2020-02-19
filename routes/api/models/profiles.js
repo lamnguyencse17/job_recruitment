@@ -57,10 +57,10 @@ router.delete("/", (req, res) => {
             return res.status(400).json({ message: "Database system is not available" })
         } else {
             let validate = await client.db('job_recruitment').collection('profiles').find({
-                "_id": ObjectId(req.body.profile_ID)
+                "_id": ObjectId(req.user)
             }).toArray()
-            if (validate.length == 0 || validate[0]._id != req.user) {
-                return res.status(401).json({ message: "Not authorized or profile_ID does not exist" })
+            if (validate.length == 0) {
+                return res.status(401).json({ message: "profile_ID does not exist" })
             } else {
                 let result = await deleteProfiles(client, req.user, req.role)
                 return res.status(result.code).json(result.message ? result.message : result.info)

@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
+import Router from "next/router"
 import PropTypes from 'prop-types';
 
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { withRouter } from "react-router-dom";
 
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
@@ -12,9 +12,9 @@ import InputGroup from 'react-bootstrap/InputGroup';
 
 import Popup from "../../Common/Popup";
 
-import { loginProcess } from "../../../actions/auth";
-import { getProfile } from "../../../actions/profile";
-import { clearErrors } from "../../../actions/errors";
+import { loginProcess } from "../../actions/auth";
+import { getProfile } from "../../actions/profile";
+import { clearErrors } from "../../actions/errors";
 
 
 
@@ -33,7 +33,7 @@ class LoginModal extends Component {
         if (result) {
             this.props.handleClose();
             this.props.getProfile(result.id, result.token);
-            this.props.history.push("/");
+            Router.push("/");
             return;
         }
     };
@@ -47,15 +47,11 @@ class LoginModal extends Component {
                         <Modal.Title>Login</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <InputGroup.Prepend>
-                            <InputGroup.Text>Username</InputGroup.Text>
-                        </InputGroup.Prepend>
+                        Username
                         <InputGroup className="mb-3">
                             <FormControl ref={this.username} aria-describedby="basic-addon1" />
                         </InputGroup>
-                        <InputGroup.Prepend>
-                            <InputGroup.Text>Password</InputGroup.Text>
-                        </InputGroup.Prepend>
+                        Password
                         <InputGroup className="mb-3">
                             <FormControl type="password" ref={this.password} aria-describedby="basic-addon1" />
                         </InputGroup>
@@ -93,4 +89,4 @@ function mapDispatchToProps(dispatch) {
     );
 }
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(LoginModal));
+export default connect(mapStateToProps, mapDispatchToProps)(LoginModal);

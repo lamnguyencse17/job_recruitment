@@ -5,7 +5,8 @@ import {
     LOGIN_PROCESS,
     LOGOUT_PROCESS,
     AUTH_PROCESS,
-    VERIFY_PROCESS
+    VERIFY_PROCESS,
+    CLEAR_ERRORS
 } from "./types";
 import { setErrors } from './errors';
 
@@ -75,12 +76,9 @@ export const logoutProcess = (token) => dispatch => {
                 },
             }
         )
-        .then(res => {
-            if (res.status == 200) {
-                dispatch({ type: LOGOUT_PROCESS, payload: true }); // is not needed
-            } else {
-                console.log(res.data);
-            }
+        .then(() => {
+            dispatch({ type: CLEAR_ERRORS, payload: true });
+            dispatch({ type: LOGOUT_PROCESS, payload: true }); // is not needed
         })
         .catch(err => {
             console.log(err);

@@ -7,7 +7,7 @@ import { connect } from "react-redux";
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 
-import { putProfile } from "../../../actions/profile";
+import { putProfile } from "../actions/profile";
 
 class EditProfile extends Component {
     constructor() {

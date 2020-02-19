@@ -1,5 +1,5 @@
 import axios from "axios";
-import { GET_PROFILE, POST_PROFILE, PUT_PROFILE } from "./types";
+import { GET_PROFILE, POST_PROFILE, PUT_PROFILE, DELETE_PROFILE, LOGOUT_PROCESS, CLEAR_ERRORS } from "./types";
 import { setErrors } from './errors';
 
 export const getProfile = (id, token) => dispatch => {
@@ -60,4 +60,24 @@ export const putProfile = (email, dob, name, token) => dispatch => {
             console.log(err);
             dispatch(setErrors(err.response.data, err.response.status));
         });
+};
+
+export const deleteProfile = (token) => async (dispatch) => {
+    let result = await axios.delete("http://127.0.0.1:500/api/profiles/",
+        {
+            headers: {
+                "Content-Type": "application/json",
+                "x-access-token": token
+            }
+        }).then(() => {
+            dispatch({ type: DELETE_PROFILE, payload: true });
+            dispatch({ type: LOGOUT_PROCESS, payload: true });
+            dispatch({ type: CLEAR_ERRORS, payload: true});
+            return true
+        }).catch(err => {
+            console.log(err);
+            dispatch(setErrors(err.response.data, err.response.status));
+            return false
+        });
+    return result
 };

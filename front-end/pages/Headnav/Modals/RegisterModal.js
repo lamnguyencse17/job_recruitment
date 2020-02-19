@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import Router from 'next/router'
 
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { withRouter } from "react-router-dom";
+
 
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
@@ -12,8 +13,8 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown';
 
-import { registerProcess } from "../../../actions/auth";
-import { clearErrors } from "../../../actions/errors";
+import { registerProcess } from "../../actions/auth";
+import { clearErrors } from "../../actions/errors";
 
 
 class RegisterModal extends Component {
@@ -35,7 +36,7 @@ class RegisterModal extends Component {
         this.props.handleClose();
         let result = await this.props.registerProcess(this.username.current.value, this.password.current.value, this.state.role);
         if (result) {
-            this.props.history.push('/profile');
+            Router.push('/profile')
             return;
         }
     };
@@ -48,9 +49,7 @@ class RegisterModal extends Component {
                         <Modal.Title>Register</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <InputGroup.Prepend>
-                            <InputGroup.Text>Username</InputGroup.Text>
-                        </InputGroup.Prepend>
+                        Username
                         <InputGroup className="mb-3">
                             <FormControl ref={this.username} aria-describedby="basic-addon1" />
                             <DropdownButton
@@ -62,9 +61,7 @@ class RegisterModal extends Component {
                                 <Dropdown.Item onSelect={() => { this.roleSelect(2); }}>A Recruiter</Dropdown.Item>
                             </DropdownButton>
                         </InputGroup>
-                        <InputGroup.Prepend>
-                            <InputGroup.Text>Password</InputGroup.Text>
-                        </InputGroup.Prepend>
+                        Password
                         <InputGroup className="mb-3">
                             <FormControl type="password" ref={this.password} aria-describedby="basic-addon1" />
                         </InputGroup>
@@ -101,4 +98,4 @@ function mapDispatchToProps(dispatch) {
     );
 }
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(RegisterModal));
+export default connect(mapStateToProps, mapDispatchToProps)(RegisterModal);

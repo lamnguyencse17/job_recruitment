@@ -1,4 +1,5 @@
 import {
+    SET_AUTH,
     REGISTER_PROCESS,
     LOGIN_PROCESS,
     LOGOUT_PROCESS,
@@ -7,16 +8,22 @@ import {
 } from "../actions/types";
 
 const initialState = {
-    id: localStorage.getItem("id"),
-    username: localStorage.getItem("username"),
-    token: localStorage.getItem("token"),
-    role: localStorage.getItem("role")
+    id: "",
+    username: "",
+    token: "",
+    role: ""
 };
 
 export default function (state = initialState, action) {
     switch (action.type) {
         default:
             return state;
+        case SET_AUTH:
+            localStorage.setItem("id", action.payload.id);
+            localStorage.setItem("token", action.payload.token);
+            localStorage.setItem("username", action.payload.username);
+            localStorage.setItem("role", action.payload.role);
+            return action.payload
         case REGISTER_PROCESS:
             localStorage.setItem("id", action.payload.id);
             localStorage.setItem("token", action.payload.token);
