@@ -12,3 +12,5 @@ export const CREATE_MESSAGE = "CREATE_MESSAGE";
 export const VERIFY_PROCESS = "VERIFY_PROCESS";
 export const SET_AUTH = "SET_AUTH";
 export const SET_PROFILE = "SET_PROFILE";
+export const GET_COMPANIES = "GET_COMPANIES"
+export const SET_COMPANIES = "SET_COMPANIES"

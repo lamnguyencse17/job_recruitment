@@ -2,5 +2,6 @@ import { combineReducers } from "redux";
 import auth from "./auth";
 import profile from "./profile";
 import errors from "./errors";
+import companies from "./companies"
 
-export default combineReducers({ auth, profile, errors });
+export default combineReducers({ auth, profile, errors, companies });

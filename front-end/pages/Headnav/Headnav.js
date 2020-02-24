@@ -39,7 +39,6 @@ class Headnav extends Component {
 
   componentDidMount(){
     this.setState({...this.state, mounted: true})
-    console.log(this.props)
   }
 
   render() {
@@ -66,7 +65,7 @@ class Headnav extends Component {
               </Nav>
 
               <Nav>
-                <Link href="/companies/1">
+                <Link href="/companies" as={`/companies`}>
                 <a className="nav-link">Companies</a>
                 </Link>
               </Nav>

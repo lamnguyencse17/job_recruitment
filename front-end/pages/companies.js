@@ -1,16 +1,26 @@
 import React, { Component, Fragment } from 'react';
+import Router from "next/router" 
+import PropTypes from 'prop-types';
 
 import { Provider } from 'react-redux';
 
 import store from './store';
 
+import { getCompanies } from "./actions/companies";
+import { SET_COMPANIES, SET_PROFILE, SET_AUTH } from "./actions/types";
+
 import Headnav from './Headnav/Headnav';
-import Profile from "./Profile/Profile";
+import Companies from "./Companies/Companies";
 
-import { SET_PROFILE, SET_AUTH } from "./actions/types";
 var state = store.getState();
+export default class CompaniesIndex extends Component {
+    static async getInitialProps() {
+        if (state.companies.page.length == 0) {
+            return { page: await store.dispatch(getCompanies(1)) };
+        }
+        return {}
+    }
 
-class profileIndex extends Component {
     componentDidMount() {
         let authRedux, profileRedux;
         if (state.auth.id == "") {
@@ -31,6 +41,9 @@ class profileIndex extends Component {
             };
             store.dispatch({ type: SET_PROFILE, payload: profileRedux });
         }
+        if (state.companies.page.length == 0) {
+            store.dispatch({ type: SET_COMPANIES, payload: this.props.page })
+        } 
     }
     render() {
         return (
@@ -45,11 +58,13 @@ class profileIndex extends Component {
                 </head>
                 <Provider store={store}>
                     <Headnav />
-                    <Profile />
+                    <Companies />
                 </Provider>
             </Fragment>
         );
     }
 }
 
-export default profileIndex;
+CompaniesIndex.propTypes = {
+    page: PropTypes.array.isRequired,
+  };

@@ -1,17 +1,25 @@
 import React, { Component, Fragment } from 'react';
-
 import { Provider } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import store from './store';
 
 
-import Body from './Body/Body';
 import Headnav from './Headnav/Headnav';
 
-import {SET_AUTH, SET_PROFILE} from "./actions/types"
+import {SET_AUTH, SET_PROFILE, SET_COMPANIES} from "./actions/types"
+import {getCompanies} from "./actions/companies"
 
 
 export default class App extends Component {
+    static async getInitialProps(){
+        let state = store.getState()
+        if (state.companies.page.length == 0){
+            return {page: await store.dispatch(getCompanies(1))}
+        }
+        return {}
+    }
+
     componentDidMount(){
         let authRedux = {
             id: localStorage.getItem("id"),
@@ -27,6 +35,7 @@ export default class App extends Component {
         }
         store.dispatch({type: SET_AUTH, payload: authRedux})
         store.dispatch({type: SET_PROFILE, payload: profileRedux})
+        store.dispatch({type: SET_COMPANIES, payload: this.props.page})
     }
     render() {
         return (
@@ -39,12 +48,15 @@ export default class App extends Component {
                         crossOrigin="anonymous"
                     />
                 </head>
-            
                 <Provider store={store}>
                     <Headnav />
-                    <Body />
+                    <h1> SOMETHING GOES HERE</h1>
                 </Provider>
             </Fragment>
         );
     }
+}
+
+App.propTypes = {
+    page: PropTypes.array.isRequired
 }
