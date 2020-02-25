@@ -23,7 +23,7 @@ export default function (state = initialState, action) {
             localStorage.setItem("token", action.payload.token);
             localStorage.setItem("username", action.payload.username);
             localStorage.setItem("role", action.payload.role);
-            return action.payload
+            return action.payload;
         case REGISTER_PROCESS:
             localStorage.setItem("id", action.payload.id);
             localStorage.setItem("token", action.payload.token);

@@ -7,35 +7,35 @@ import store from './store';
 
 import Headnav from './Headnav/Headnav';
 
-import {SET_AUTH, SET_PROFILE, SET_COMPANIES} from "./actions/types"
-import {getCompanies} from "./actions/companies"
+import { SET_AUTH, SET_PROFILE, SET_COMPANIES } from "./actions/types";
+import { getCompanies } from "./actions/companies";
 
 
 export default class App extends Component {
-    static async getInitialProps(){
-        let state = store.getState()
-        if (state.companies.page.length == 0){
-            return {page: await store.dispatch(getCompanies(1))}
+    static async getInitialProps() {
+        let state = store.getState();
+        if (state.companies.page.length == 0) {
+            return { page: await store.dispatch(getCompanies(1)) };
         }
-        return {}
+        return {};
     }
 
-    componentDidMount(){
+    componentDidMount() {
         let authRedux = {
             id: localStorage.getItem("id"),
             username: localStorage.getItem("username"),
             token: localStorage.getItem("token"),
             role: localStorage.getItem("role")
-          }
+        };
         let profileRedux = {
             name: localStorage.getItem("name"),
             email: localStorage.getItem("email"),
             dob: localStorage.getItem("dob"),
             cvs: localStorage.getItem("cvs")
-        }
-        store.dispatch({type: SET_AUTH, payload: authRedux})
-        store.dispatch({type: SET_PROFILE, payload: profileRedux})
-        store.dispatch({type: SET_COMPANIES, payload: this.props.page})
+        };
+        store.dispatch({ type: SET_AUTH, payload: authRedux });
+        store.dispatch({ type: SET_PROFILE, payload: profileRedux });
+        store.dispatch({ type: SET_COMPANIES, payload: this.props.page });
     }
     render() {
         return (
@@ -59,4 +59,4 @@ export default class App extends Component {
 
 App.propTypes = {
     page: PropTypes.array.isRequired
-}
+};

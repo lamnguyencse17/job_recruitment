@@ -16,7 +16,7 @@ export default function (state = initialState, action) {
             localStorage.setItem("email", action.payload.email);
             localStorage.setItem("dob", action.payload.dob);
             localStorage.setItem("cvs", action.payload.cvs);
-            return action.payload
+            return action.payload;
         case GET_PROFILE:
         case POST_PROFILE:
             localStorage.setItem("name", action.payload.name);

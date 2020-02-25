@@ -1,24 +1,22 @@
 import React, { Component, Fragment } from 'react';
 import Router from "next/router";
+import { withRouter } from 'next/router';
 import PropTypes from 'prop-types';
 
 import { Provider } from 'react-redux';
 
-import store from './store';
+import store from '../../store';
 
-import { getCompanies } from "./actions/companies";
-import { SET_COMPANIES, SET_PROFILE, SET_AUTH } from "./actions/types";
+import Headnav from '../../Headnav/Headnav';
 
-import Headnav from './Headnav/Headnav';
-import Companies from "./Companies/Companies";
-
+import { getCompany } from "../../actions/company";
+import { SET_AUTH, SET_PROFILE, SET_COMPANY } from "../../actions/types";
 var state = store.getState();
-export default class CompaniesIndex extends Component {
-    static async getInitialProps() {
-        if (state.companies.page.length == 0) {
-            return { page: await store.dispatch(getCompanies(1)) };
-        }
-        return {};
+
+class CompanyIndex extends Component {
+    static async getInitialProps(router) {
+        let id = router.query.id;
+        return { company: await store.dispatch(getCompany(id)) };
     }
 
     componentDidMount() {
@@ -41,8 +39,9 @@ export default class CompaniesIndex extends Component {
             };
             store.dispatch({ type: SET_PROFILE, payload: profileRedux });
         }
-        if (state.companies.page.length == 0) {
-            store.dispatch({ type: SET_COMPANIES, payload: this.props.page });
+        console.log(state.company);
+        if (Object.entries(state.company).length === 0 && state.company.constructor === Object) {
+            store.dispatch({ type: SET_COMPANY, payload: this.props.company });
         }
     }
     render() {
@@ -58,13 +57,20 @@ export default class CompaniesIndex extends Component {
                 </head>
                 <Provider store={store}>
                     <Headnav />
-                    <Companies />
+                    <p>{this.props.company.name}</p>
+                    <p>{this.props.company.location}</p>
+                    <p>{this.props.company.description}</p>
+                    <p>{this.props.company.size}</p>
+                    <p>{this.props.company.email}</p>
+                    <p>{this.props.company.phone}</p>
                 </Provider>
             </Fragment>
         );
     }
 }
 
-CompaniesIndex.propTypes = {
-    page: PropTypes.array.isRequired,
+CompanyIndex.propTypes = {
+    company: PropTypes.object.isRequired
 };
+
+export default withRouter(CompanyIndex);

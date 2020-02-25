@@ -72,12 +72,12 @@ export const deleteProfile = (token) => async (dispatch) => {
         }).then(() => {
             dispatch({ type: DELETE_PROFILE, payload: true });
             dispatch({ type: LOGOUT_PROCESS, payload: true });
-            dispatch({ type: CLEAR_ERRORS, payload: true});
-            return true
+            dispatch({ type: CLEAR_ERRORS, payload: true });
+            return true;
         }).catch(err => {
             console.log(err);
             dispatch(setErrors(err.response.data, err.response.status));
-            return false
+            return false;
         });
-    return result
+    return result;
 };
