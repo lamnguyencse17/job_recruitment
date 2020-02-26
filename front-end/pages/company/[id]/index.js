@@ -1,16 +1,20 @@
 import React, { Component, Fragment } from 'react';
-import Router from "next/router";
+import Col from "react-bootstrap/Col";
+import Row from "react-bootstrap/Row";
+import Container from "react-bootstrap/Container";
+import Image from "react-bootstrap/Image";
+
 import { withRouter } from 'next/router';
 import PropTypes from 'prop-types';
 
 import { Provider } from 'react-redux';
 
-import store from '../../store';
+import store from '../../../component/store';
 
-import Headnav from '../../Headnav/Headnav';
+import Headnav from '../../../component/Headnav/Headnav';
 
-import { getCompany } from "../../actions/company";
-import { SET_AUTH, SET_PROFILE, SET_COMPANY } from "../../actions/types";
+import { getCompany } from "../../../component/actions/company";
+import { SET_AUTH, SET_PROFILE, SET_COMPANY } from "../../../component/actions/types";
 var state = store.getState();
 
 class CompanyIndex extends Component {
@@ -39,7 +43,6 @@ class CompanyIndex extends Component {
             };
             store.dispatch({ type: SET_PROFILE, payload: profileRedux });
         }
-        console.log(state.company);
         if (Object.entries(state.company).length === 0 && state.company.constructor === Object) {
             store.dispatch({ type: SET_COMPANY, payload: this.props.company });
         }
@@ -57,12 +60,31 @@ class CompanyIndex extends Component {
                 </head>
                 <Provider store={store}>
                     <Headnav />
-                    <p>{this.props.company.name}</p>
-                    <p>{this.props.company.location}</p>
-                    <p>{this.props.company.description}</p>
-                    <p>{this.props.company.size}</p>
-                    <p>{this.props.company.email}</p>
-                    <p>{this.props.company.phone}</p>
+                    <Container fluid>
+                        <Row>
+                            <Col xs={2}></Col>
+                            <Col>
+                                <Row className="bg-light">
+                                    <Col xs={4}>
+                                        <Container className="position-relative">
+                                            <Image src="https://cdn.itviec.com/employers/itviec-com-s-client/logo/social/21Hhw7GCbkU2ntEmjUHdmNn8/itviec-com-s-client-logo.jpg"></Image>
+                                        </Container>
+                                    </Col>
+                                    <Col>
+                                        <h1>{this.props.company.name}</h1>
+                                        <Container>
+                                            <p>Location: {this.props.company.location}</p>
+                                            <p>Description: {this.props.company.description}</p>
+                                            <p>Size: {this.props.company.size}</p>
+                                            <p>Email: {this.props.company.email}</p>
+                                            <p>Phone: {this.props.company.phone}</p>
+                                        </Container>
+                                    </Col>
+                                </Row>
+                            </Col>
+                            <Col xs={2}></Col>
+                        </Row>
+                    </Container>
                 </Provider>
             </Fragment>
         );

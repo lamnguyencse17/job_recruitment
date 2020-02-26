@@ -1,16 +1,16 @@
 import React, { Component, Fragment } from 'react';
-import Router from "next/router";
+
 import PropTypes from 'prop-types';
 
 import { Provider } from 'react-redux';
 
-import store from './store';
+import store from '../component/store';
 
-import { getCompanies } from "./actions/companies";
-import { SET_COMPANIES, SET_PROFILE, SET_AUTH } from "./actions/types";
+import { getCompanies } from "../component/actions/companies";
+import { SET_COMPANIES, SET_PROFILE, SET_AUTH } from "../component/actions/types";
 
-import Headnav from './Headnav/Headnav';
-import Companies from "./Companies/Companies";
+import Headnav from '../component/Headnav/Headnav';
+import Companies from "../component/Companies/Companies";
 
 var state = store.getState();
 export default class CompaniesIndex extends Component {

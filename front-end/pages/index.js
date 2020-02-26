@@ -2,13 +2,13 @@ import React, { Component, Fragment } from 'react';
 import { Provider } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import store from './store';
+import store from '../component/store';
 
 
-import Headnav from './Headnav/Headnav';
+import Headnav from '../component/Headnav/Headnav';
 
-import { SET_AUTH, SET_PROFILE, SET_COMPANIES } from "./actions/types";
-import { getCompanies } from "./actions/companies";
+import { SET_AUTH, SET_PROFILE, SET_COMPANIES } from "../component/actions/types";
+import { getCompanies } from "../component/actions/companies";
 
 
 export default class App extends Component {
