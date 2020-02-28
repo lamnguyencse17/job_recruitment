@@ -38,7 +38,7 @@ router.use('/jobs', function(req, res, next){
         return res.status(400).json({ message: `${param} ID was invalid` })
     }
     next()
-}, require('./models/cvs'))
+}, require('./models/jobs'))
 
 router.use('/profiles', function(req, res, next){
     let param = req.path.replace("/", "")

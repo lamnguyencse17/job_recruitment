@@ -59,13 +59,13 @@ class Headnav extends Component {
                 </Link>
               </Nav>
               <Nav>
-                <Link href="/jobs">
+                <Link href="/job/p/1">
                 <a className="nav-link">All Jobs</a>
                 </Link>
               </Nav>
 
               <Nav>
-                <Link href="/companies" as={`/companies`}>
+                <Link href="/company/p/1">
                 <a className="nav-link">Companies</a>
                 </Link>
               </Nav>

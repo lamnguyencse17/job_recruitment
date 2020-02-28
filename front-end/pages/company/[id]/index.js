@@ -9,12 +9,12 @@ import PropTypes from 'prop-types';
 
 import { Provider } from 'react-redux';
 
-import store from '../../../component/store';
+import store from 'Components/store';
 
-import Headnav from '../../../component/Headnav/Headnav';
+import Headnav from 'Components/Headnav/Headnav';
 
-import { getCompany } from "../../../component/actions/company";
-import { SET_AUTH, SET_PROFILE, SET_COMPANY } from "../../../component/actions/types";
+import { getCompany } from "Components/actions/company";
+import { SET_AUTH, SET_PROFILE, SET_COMPANY } from "Components/actions/types";
 var state = store.getState();
 
 class CompanyIndex extends Component {

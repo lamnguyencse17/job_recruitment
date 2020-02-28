@@ -1,19 +1,24 @@
 import React, { Component, Fragment } from 'react';
-import { withRouter } from 'next/router';
+
 import PropTypes from 'prop-types';
 
 import { Provider } from 'react-redux';
 
 import store from 'Components/store';
 
-import {SET_PROFILE, SET_AUTH } from "Components/actions/types";
+import {SET_PROFILE, SET_AUTH, SET_JOBS } from "Components/actions/types";
+import {getJobs} from "Components/actions/jobs"
 
 import Headnav from 'Components/Headnav/Headnav';
+import Jobs from 'Components/Jobs/Jobs';
 
 var state = store.getState();
-
-class JobIndex extends Component {
-    static async getInitialProps() {
+export default class JobsIndex extends Component {
+    static async getInitialProps(router) {
+        let page = router.query.page;
+        if (state.jobs.page.length == 0) {
+            return { page: await store.dispatch(getJobs(page)) };
+        }
         return {};
     }
 
@@ -37,6 +42,9 @@ class JobIndex extends Component {
             };
             store.dispatch({ type: SET_PROFILE, payload: profileRedux });
         }
+        if (state.companies.page.length == 0) {
+            store.dispatch({ type: SET_JOBS, payload: this.props.page });
+        }
     }
     render() {
         return (
@@ -51,13 +59,12 @@ class JobIndex extends Component {
                 </head>
                 <Provider store={store}>
                     <Headnav />
+                    <Jobs/>
                 </Provider>
             </Fragment>
         );
     }
 }
 
-JobIndex.propTypes = {
+JobsIndex.propTypes = {
 };
-
-export default withRouter(JobIndex);

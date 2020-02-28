@@ -2,12 +2,12 @@ import React, { Component, Fragment } from 'react';
 
 import { Provider } from 'react-redux';
 
-import store from '../component/store';
+import store from 'Components/store';
 
-import Headnav from '../component/Headnav/Headnav';
-import Profile from "../component/Profile/Profile";
+import Headnav from 'Components/Headnav/Headnav';
+import Profile from "Components/Profile/Profile";
 
-import { SET_PROFILE, SET_AUTH } from "../component/actions/types";
+import { SET_PROFILE, SET_AUTH } from "Components/actions/types";
 var state = store.getState();
 
 class profileIndex extends Component {

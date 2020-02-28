@@ -2,16 +2,16 @@ import React, { Component, Fragment } from 'react';
 import { Provider } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import store from '../component/store';
+import store from 'Components/store';
+
+import Headnav from 'Components/Headnav/Headnav'
+// import Headnav from '../component/Headnav/Headnav';
+
+import { SET_AUTH, SET_PROFILE, SET_COMPANIES } from "Components/actions/types";
+import { getCompanies } from "Components/actions/companies";
 
 
-import Headnav from '../component/Headnav/Headnav';
-
-import { SET_AUTH, SET_PROFILE, SET_COMPANIES } from "../component/actions/types";
-import { getCompanies } from "../component/actions/companies";
-
-
-export default class App extends Component {
+export default class Index extends Component {
     static async getInitialProps() {
         let state = store.getState();
         if (state.companies.page.length == 0) {
@@ -57,6 +57,6 @@ export default class App extends Component {
     }
 }
 
-App.propTypes = {
+Index.propTypes = {
     page: PropTypes.array.isRequired
 };

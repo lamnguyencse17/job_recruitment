@@ -4,13 +4,13 @@ import PropTypes from 'prop-types';
 
 import { Provider } from 'react-redux';
 
-import store from '../component/store';
+import store from 'Components/store';
 
-import { getCompanies } from "../component/actions/companies";
-import { SET_COMPANIES, SET_PROFILE, SET_AUTH } from "../component/actions/types";
+import { getCompanies } from "Components/actions/companies";
+import { SET_COMPANIES, SET_PROFILE, SET_AUTH } from "Components/actions/types";
 
-import Headnav from '../component/Headnav/Headnav';
-import Companies from "../component/Companies/Companies";
+import Headnav from 'Components/Headnav/Headnav';
+import Companies from "Components/Companies/Companies";
 
 var state = store.getState();
 export default class CompaniesIndex extends Component {
