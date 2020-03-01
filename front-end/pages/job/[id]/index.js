@@ -6,18 +6,26 @@ import { Provider } from 'react-redux';
 
 import store from 'Components/store';
 
-import {SET_PROFILE, SET_AUTH } from "Components/actions/types";
+import { SET_PROFILE, SET_AUTH, SET_JOB } from "Components/actions/types";
 
 import Headnav from 'Components/Headnav/Headnav';
+import SingleJob from "Components/Jobs/SingleJob";
+import { getJob } from "Components/actions/job";
+import { authProcess } from "Components/actions/auth";
 
 var state = store.getState();
 
 class JobIndex extends Component {
-    static async getInitialProps() {
+    static async getInitialProps(router) {
+        let id = router.query.id;
+        console.log(id);
+        if (state.jobs.page.length == 0) {
+            return { job: await store.dispatch(getJob(id)) };
+        }
         return {};
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         let authRedux, profileRedux;
         if (state.auth.id == "") {
             authRedux = {
@@ -26,16 +34,22 @@ class JobIndex extends Component {
                 token: localStorage.getItem("token"),
                 role: localStorage.getItem("role")
             };
-            store.dispatch({ type: SET_AUTH, payload: authRedux });
         }
-        if (state.profile.name == "") {
-            profileRedux = {
-                name: localStorage.getItem("name"),
-                email: localStorage.getItem("email"),
-                dob: localStorage.getItem("dob"),
-                cvs: localStorage.getItem("cvs")
-            };
-            store.dispatch({ type: SET_PROFILE, payload: profileRedux });
+        let authorized = await store.dispatch(authProcess(authRedux.token));
+        if (authorized) {
+            store.dispatch({ type: SET_AUTH, payload: authRedux });
+            if (state.profile.name == "") {
+                profileRedux = {
+                    name: localStorage.getItem("name"),
+                    email: localStorage.getItem("email"),
+                    dob: localStorage.getItem("dob"),
+                    cvs: localStorage.getItem("cvs")
+                };
+                store.dispatch({ type: SET_PROFILE, payload: profileRedux });
+            }
+        }
+        if (Object.entries(state.job).length === 0 && state.job.constructor === Object) {
+            store.dispatch({ type: SET_JOB, payload: this.props.job });
         }
     }
     render() {
@@ -51,6 +65,7 @@ class JobIndex extends Component {
                 </head>
                 <Provider store={store}>
                     <Headnav />
+                    <SingleJob job={this.props.job} />
                 </Provider>
             </Fragment>
         );
@@ -58,6 +73,7 @@ class JobIndex extends Component {
 }
 
 JobIndex.propTypes = {
+    job: PropTypes.object.isRequired
 };
 
 export default withRouter(JobIndex);

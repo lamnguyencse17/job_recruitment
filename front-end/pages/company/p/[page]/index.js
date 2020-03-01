@@ -7,6 +7,7 @@ import { Provider } from 'react-redux';
 import store from 'Components/store';
 
 import { getCompanies } from "Components/actions/companies";
+import { authProcess } from "Components/actions/auth";
 import { SET_COMPANIES, SET_PROFILE, SET_AUTH } from "Components/actions/types";
 
 import Headnav from 'Components/Headnav/Headnav';
@@ -21,7 +22,7 @@ export default class CompaniesIndex extends Component {
         return {};
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         let authRedux, profileRedux;
         if (state.auth.id == "") {
             authRedux = {
@@ -30,16 +31,19 @@ export default class CompaniesIndex extends Component {
                 token: localStorage.getItem("token"),
                 role: localStorage.getItem("role")
             };
-            store.dispatch({ type: SET_AUTH, payload: authRedux });
         }
-        if (state.profile.name == "") {
-            profileRedux = {
-                name: localStorage.getItem("name"),
-                email: localStorage.getItem("email"),
-                dob: localStorage.getItem("dob"),
-                cvs: localStorage.getItem("cvs")
-            };
-            store.dispatch({ type: SET_PROFILE, payload: profileRedux });
+        let authorized = await store.dispatch(authProcess(authRedux.token));
+        if (authorized) {
+            store.dispatch({ type: SET_AUTH, payload: authRedux });
+            if (state.profile.name == "") {
+                profileRedux = {
+                    name: localStorage.getItem("name"),
+                    email: localStorage.getItem("email"),
+                    dob: localStorage.getItem("dob"),
+                    cvs: localStorage.getItem("cvs")
+                };
+                store.dispatch({ type: SET_PROFILE, payload: profileRedux });
+            }
         }
         if (state.companies.page.length == 0) {
             store.dispatch({ type: SET_COMPANIES, payload: this.props.page });

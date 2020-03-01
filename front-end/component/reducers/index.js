@@ -5,5 +5,6 @@ import errors from "./errors";
 import companies from "./companies";
 import company from "./company";
 import jobs from "./jobs";
+import job from "./job"
 
-export default combineReducers({ auth, profile, errors, companies, company, jobs });
+export default combineReducers({ auth, profile, errors, companies, company, jobs, job });

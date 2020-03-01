@@ -7,6 +7,7 @@ import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
+import Nav from "react-bootstrap/Nav";
 
 import { connect } from "react-redux";
 
@@ -20,6 +21,11 @@ class Jobs extends Component {
     componentDidMount() {
         this.setState({ ...this.state, mounted: true });
     }
+
+    handleApply = (id) => {
+        console.log(id)
+    }
+
     render() {
         return (this.state.mounted ?
             (<Container>
@@ -27,7 +33,23 @@ class Jobs extends Component {
                 <Row>
                     <Col></Col>
                     <Col xs={8}>
-                        <p>something goes here</p>
+                        {this.props.jobs.page.map(job => {
+                            return (
+                                <Card key={job._id} style={{ width: "100%" }}>
+                                    <Card.Img variant="top" />
+                                    <Card.Body>
+                                        <Card.Title>
+                                            <Link href={`/job/${job._id}`}>
+                                                <a className="nav-link">{job.name}</a>
+                                            </Link>
+                                        </Card.Title>
+                                        <Card.Text>{job.description} - {job.salary} </Card.Text>
+                                        <Card.Text>Open Positions: {job.employees} </Card.Text>
+                                        <Card.Text>{job.date}</Card.Text>
+                                            <Button variant="primary" onClick={() => this.handleApply(job._id)}>Apply Now</Button>
+                                    </Card.Body>
+                                </Card>);
+                        })}
                     </Col>
                     <Col></Col>
                 </Row>
@@ -37,7 +59,8 @@ class Jobs extends Component {
 }
 
 Jobs.propTypes = {
-  };
+    jobs: PropTypes.object.isRequired
+};
 
 function mapStateToProps(state) {
     return {

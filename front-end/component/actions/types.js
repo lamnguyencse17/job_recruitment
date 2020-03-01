@@ -18,3 +18,5 @@ export const GET_COMPANY = "GET_COMPANY";
 export const SET_COMPANY = "SET_COMPANY";
 export const GET_JOBS = "GET_JOBS";
 export const SET_JOBS = "SET_JOBS";
+export const GET_JOB = "GET_JOB";
+export const SET_JOB = "SET_JOB";

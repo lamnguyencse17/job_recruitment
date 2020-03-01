@@ -4,11 +4,11 @@ import PropTypes from 'prop-types';
 
 import store from 'Components/store';
 
-import Headnav from 'Components/Headnav/Headnav'
-// import Headnav from '../component/Headnav/Headnav';
+import Headnav from 'Components/Headnav/Headnav';
 
 import { SET_AUTH, SET_PROFILE, SET_COMPANIES } from "Components/actions/types";
 import { getCompanies } from "Components/actions/companies";
+import { authProcess } from "Components/actions/auth";
 
 
 export default class Index extends Component {
@@ -20,7 +20,7 @@ export default class Index extends Component {
         return {};
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         let authRedux = {
             id: localStorage.getItem("id"),
             username: localStorage.getItem("username"),
@@ -33,9 +33,12 @@ export default class Index extends Component {
             dob: localStorage.getItem("dob"),
             cvs: localStorage.getItem("cvs")
         };
-        store.dispatch({ type: SET_AUTH, payload: authRedux });
-        store.dispatch({ type: SET_PROFILE, payload: profileRedux });
-        store.dispatch({ type: SET_COMPANIES, payload: this.props.page });
+        let authorized = await store.dispatch(authProcess(authRedux.token));
+        if (authorized) {
+            store.dispatch({ type: SET_AUTH, payload: authRedux });
+            store.dispatch({ type: SET_PROFILE, payload: profileRedux });
+            store.dispatch({ type: SET_COMPANIES, payload: this.props.page });
+        }
     }
     render() {
         return (

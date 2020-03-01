@@ -86,8 +86,8 @@ export const logoutProcess = (token) => dispatch => {
         }); // Error would be Token expired
 };
 
-export const authProcess = (token) => dispatch => {
-    axios
+export const authProcess = (token) => async dispatch => {
+    let result = await axios
         .get(
             'http://127.0.0.1:5000/api/auths/verify',
             {
@@ -99,11 +99,14 @@ export const authProcess = (token) => dispatch => {
         )
         .then(res => {
             dispatch({ type: AUTH_PROCESS, payload: res.data }); // payload: id, role
+            return true
         })
         .catch(err => {
             console.log(err);
             dispatch({ type: LOGOUT_PROCESS, payload: true });
+            return false
         });
+    return result
 };
 
 export const verifyProcess = (token, password) => dispatch => {

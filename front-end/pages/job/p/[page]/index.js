@@ -1,13 +1,14 @@
 import React, { Component, Fragment } from 'react';
-
+import Link from 'next/link';
 import PropTypes from 'prop-types';
 
 import { Provider } from 'react-redux';
 
 import store from 'Components/store';
 
-import {SET_PROFILE, SET_AUTH, SET_JOBS } from "Components/actions/types";
-import {getJobs} from "Components/actions/jobs"
+import { SET_PROFILE, SET_AUTH, SET_JOBS } from "Components/actions/types";
+import { getJobs } from "Components/actions/jobs";
+import { authProcess } from "Components/actions/auth";
 
 import Headnav from 'Components/Headnav/Headnav';
 import Jobs from 'Components/Jobs/Jobs';
@@ -22,7 +23,7 @@ export default class JobsIndex extends Component {
         return {};
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         let authRedux, profileRedux;
         if (state.auth.id == "") {
             authRedux = {
@@ -31,18 +32,21 @@ export default class JobsIndex extends Component {
                 token: localStorage.getItem("token"),
                 role: localStorage.getItem("role")
             };
+        }
+        let authorized = await store.dispatch(authProcess(authRedux.token));
+        if (authorized) {
             store.dispatch({ type: SET_AUTH, payload: authRedux });
+            if (state.profile.name == "") {
+                profileRedux = {
+                    name: localStorage.getItem("name"),
+                    email: localStorage.getItem("email"),
+                    dob: localStorage.getItem("dob"),
+                    cvs: localStorage.getItem("cvs")
+                };
+                store.dispatch({ type: SET_PROFILE, payload: profileRedux });
+            }
         }
-        if (state.profile.name == "") {
-            profileRedux = {
-                name: localStorage.getItem("name"),
-                email: localStorage.getItem("email"),
-                dob: localStorage.getItem("dob"),
-                cvs: localStorage.getItem("cvs")
-            };
-            store.dispatch({ type: SET_PROFILE, payload: profileRedux });
-        }
-        if (state.companies.page.length == 0) {
+        if (state.jobs.page.length == 0) {
             store.dispatch({ type: SET_JOBS, payload: this.props.page });
         }
     }
@@ -59,7 +63,7 @@ export default class JobsIndex extends Component {
                 </head>
                 <Provider store={store}>
                     <Headnav />
-                    <Jobs/>
+                    <Jobs />
                 </Provider>
             </Fragment>
         );
@@ -67,4 +71,5 @@ export default class JobsIndex extends Component {
 }
 
 JobsIndex.propTypes = {
+    page: PropTypes.array.isRequired
 };

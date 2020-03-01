@@ -8,10 +8,11 @@ import Headnav from 'Components/Headnav/Headnav';
 import Profile from "Components/Profile/Profile";
 
 import { SET_PROFILE, SET_AUTH } from "Components/actions/types";
+import { authProcess } from "Components/actions/auth";
 var state = store.getState();
 
 class profileIndex extends Component {
-    componentDidMount() {
+    async componentDidMount() {
         let authRedux, profileRedux;
         if (state.auth.id == "") {
             authRedux = {
@@ -20,16 +21,19 @@ class profileIndex extends Component {
                 token: localStorage.getItem("token"),
                 role: localStorage.getItem("role")
             };
-            store.dispatch({ type: SET_AUTH, payload: authRedux });
         }
-        if (state.profile.name == "") {
-            profileRedux = {
-                name: localStorage.getItem("name"),
-                email: localStorage.getItem("email"),
-                dob: localStorage.getItem("dob"),
-                cvs: localStorage.getItem("cvs")
-            };
-            store.dispatch({ type: SET_PROFILE, payload: profileRedux });
+        let authorized = await store.dispatch(authProcess(authRedux.token));
+        if (authorized) {
+            store.dispatch({ type: SET_AUTH, payload: authRedux });
+            if (state.profile.name == "") {
+                profileRedux = {
+                    name: localStorage.getItem("name"),
+                    email: localStorage.getItem("email"),
+                    dob: localStorage.getItem("dob"),
+                    cvs: localStorage.getItem("cvs")
+                };
+                store.dispatch({ type: SET_PROFILE, payload: profileRedux });
+            }
         }
     }
     render() {
