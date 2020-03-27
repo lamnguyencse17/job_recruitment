@@ -71,7 +71,6 @@ LoginModal.propTypes = {
     handleClose: PropTypes.func.isRequired,
     loginProcess: PropTypes.func.isRequired,
     getProfile: PropTypes.func.isRequired,
-    history: PropTypes.object.isRequired,
     clearErrors: PropTypes.func.isRequired,
     popup: PropTypes.bool.isRequired
 };

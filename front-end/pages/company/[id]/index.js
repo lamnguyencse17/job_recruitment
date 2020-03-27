@@ -14,7 +14,7 @@ import store from 'Components/store';
 import Headnav from 'Components/Headnav/Headnav';
 import SingleCompany from "Components/Companies/SingleCompany";
 
-import { authProcess } from "Components/actions/company";
+import { authProcess } from "Components/actions/auth";
 import { getCompany } from "Components/actions/company";
 import { SET_AUTH, SET_PROFILE, SET_COMPANY } from "Components/actions/types";
 var state = store.getState();

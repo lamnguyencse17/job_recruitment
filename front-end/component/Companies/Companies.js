@@ -32,11 +32,11 @@ class Companies extends Component {
                                 <Card key={company._id} style={{ width: "100%" }}>
                                     <Card.Img variant="top" />
                                     <Card.Body>
-                                        <Card.Title>{company.name}</Card.Title>
+                                        <Card.Title><Link href={`/company/${company._id}`}>
+                                            <a className="nav-link">{company.name}</a>
+                                        </Link></Card.Title>
+
                                         <Card.Text>{company.description}</Card.Text>
-                                        <Link href={`/company/${company._id}`}>
-                                            <Button variant="primary">{`Visit ${company.name} site`}</Button>
-                                        </Link>
                                     </Card.Body>
                                 </Card>
                             );
@@ -51,7 +51,7 @@ class Companies extends Component {
 
 Companies.propTypes = {
     companies: PropTypes.object.isRequired,
-  };
+};
 
 function mapStateToProps(state) {
     return {

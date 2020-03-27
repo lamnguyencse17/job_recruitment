@@ -75,7 +75,7 @@ class Headnav extends Component {
                 </Link>
               </Nav>
             </Nav>
-            {this.props.token != "null" ? (
+            {this.props.token != "" ? (
               <Nav>
                 <Nav>
                   <Link href="/profile">
