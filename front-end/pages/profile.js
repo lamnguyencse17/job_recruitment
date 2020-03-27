@@ -14,6 +14,7 @@ var state = store.getState();
 class profileIndex extends Component {
     async componentDidMount() {
         let authRedux, profileRedux;
+        console.log(state.auth.id)
         if (state.auth.id == "") {
             authRedux = {
                 id: localStorage.getItem("id"),

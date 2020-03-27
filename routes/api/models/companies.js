@@ -84,12 +84,7 @@ async function getAllCompanies(client, page) { // page is to make sure that we'r
     let info = await client.db('job_recruitment').collection("companies").find({
         $query: {},
         $orderby: { $natural: -1 }
-    }).limit(page * 10).toArray()
-
-    info.map(field => {
-        delete field.recruiters
-        delete field.cvs
-    })
+    },{recruiters: 0, cvs: 0}).limit(page * 10).toArray()
     return { code: 200, info: info }
 }
 
@@ -142,7 +137,7 @@ async function putCompanies(client, company_ID, detail) {
         return { code: 400, message: "Job ID does not exist" }
     } else {
         // eslint-disable-next-line no-unused-vars
-        let result = await client.db('job_recruitment').collection('companies').updateOne({ "_id": ObjectId(company_ID) }, {
+        let result = await client.db('job_recruitment').collection('companies').findOneAndUpdate({ "_id": ObjectId(company_ID) }, {
             $set: {
                 "name": detail.name ? detail.name : info[0].name,
                 "location": detail.location ? detail.location : info[0].location,
@@ -152,15 +147,15 @@ async function putCompanies(client, company_ID, detail) {
                 "phone": detail.phone ? detail.phone : info[0].phone,
                 "email": detail.email ? detail.email : info[0].email,
             }
-        })
-        info[0].name = detail.name ? detail.name : info[0].name
-        info[0].location = detail.location ? detail.location : info[0].location
-        info[0].image = detail.image ? detail.image : info[0].image
-        info[0].size = detail.size ? detail.size : info[0].size
-        info[0].description = detail.description ? detail.description : info[0].description
-        info[0].phone = detail.phone ? detail.phone : info[0].phone
-        info[0].email = detail.email ? detail.email : info[0].email
-        return { code: 200, message: info[0] }
+        }, {returnNewDocument: true})
+        // info[0].name = detail.name ? detail.name : info[0].name
+        // info[0].location = detail.location ? detail.location : info[0].location
+        // info[0].image = detail.image ? detail.image : info[0].image
+        // info[0].size = detail.size ? detail.size : info[0].size
+        // info[0].description = detail.description ? detail.description : info[0].description
+        // info[0].phone = detail.phone ? detail.phone : info[0].phone
+        // info[0].email = detail.email ? detail.email : info[0].email
+        return { code: 200, message: result }
     }
 }
 

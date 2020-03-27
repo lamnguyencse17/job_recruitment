@@ -110,14 +110,16 @@ async function getJobs(client, job_ID) {
             foreignField: "jobs",
             as: "company"
         }
+    }, {
+        $project: {
+            recruiter_ID: 0,
+            cvs: 0,
+            company: 0
+        }
     }]).toArray()
     if (info.length == 0) {
         return { code: 400, message: "Job does not exist" }
     } else {
-        delete info[0].company_ID;
-        delete info[0].cvs;
-        delete info[0].company[0].jobs
-        delete info[0].company[0].recuiters
         return { code: 200, info: info[0] }
     }
 }

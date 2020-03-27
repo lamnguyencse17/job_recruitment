@@ -79,10 +79,7 @@ async function getProfilesOwner(client, profile_ID) {
 
 async function getProfilesProtected(client, profile_ID) {
     let db = await client.db('job_recruitment').collection('profiles');
-    let info = await db.find({ "_id": ObjectId(profile_ID) }).toArray()
-    delete info[0].auth
-    delete info[0].cvs
-    delete info[0].dob
+    let info = await db.find({ "_id": ObjectId(profile_ID) },{auth: 0, cvs: 0, dob: 0}).toArray()
     return { code: 200, info: info[0] }
 }
 
