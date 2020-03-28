@@ -101,8 +101,7 @@ export const authProcess = (token) => async dispatch => {
             dispatch({ type: AUTH_PROCESS, payload: res.data }); // payload: id, role
             return true
         })
-        .catch(err => {
-            console.log(err);
+        .catch(() => {
             dispatch({ type: LOGOUT_PROCESS, payload: true });
             return false
         });

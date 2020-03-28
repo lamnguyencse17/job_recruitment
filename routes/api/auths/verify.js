@@ -13,7 +13,7 @@ router.get('/', (req, res) => {
     var token = req.headers['x-access-token'];
     if (!token) return res.status(401).send({ message: "No token provided." });
     jwt.verify(token, config.secret, (err, decoded) => {
-        if (err) { return status(500).send({ message: 'Failed to authenticate token.' }) } else {
+        if (err) { return res.status(401).send({ message: 'Failed to authenticate token.' }) } else {
             mongo.connect(dataPath, async (err, client) => {
                 if (err) {
                     errorLog.writeLog(req.baseUrl, req.path, req.method, req.body, err)
