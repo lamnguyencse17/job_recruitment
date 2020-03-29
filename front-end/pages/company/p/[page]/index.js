@@ -6,9 +6,9 @@ import { Provider } from 'react-redux';
 
 import store from 'Components/store';
 
-import { getCompanies } from "Components/actions/companies";
+import { getCompanies } from "Components/actions/models/companies";
 import { authProcess } from "Components/actions/auth";
-import { SET_COMPANIES, SET_PROFILE, SET_AUTH } from "Components/actions/types";
+import { SET_COMPANIES, SET_PROFILE, SET_AUTH } from "Components/actions/types/control_types";
 
 import Headnav from 'Components/Headnav/Headnav';
 import Companies from "Components/Companies/Companies";

@@ -1,4 +1,4 @@
-import { SET_ERRORS, CLEAR_ERRORS } from "./types";
+import { SET_ERRORS, CLEAR_ERRORS } from "../types/control_types";
 
 export const setErrors = (msg, status) => {
     return {

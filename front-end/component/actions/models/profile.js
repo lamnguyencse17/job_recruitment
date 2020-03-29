@@ -1,6 +1,8 @@
 import axios from "axios";
-import { GET_PROFILE, POST_PROFILE, PUT_PROFILE, DELETE_PROFILE, LOGOUT_PROCESS, CLEAR_ERRORS } from "./types";
-import { setErrors } from './errors';
+import { GET_PROFILE, POST_PROFILE, PUT_PROFILE, DELETE_PROFILE} from "../types/model_types";
+import {LOGOUT_PROCESS} from "../types/auth_types"
+import {CLEAR_ERRORS} from "../types/control_types"
+import { setErrors } from '../control/errors';
 
 export const getProfile = (id, token) => dispatch => {
     axios

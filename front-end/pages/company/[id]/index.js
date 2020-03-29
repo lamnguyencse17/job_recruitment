@@ -12,8 +12,8 @@ import Headnav from 'Components/Headnav/Headnav';
 import SingleCompany from "Components/Companies/SingleCompany";
 
 import { authProcess } from "Components/actions/auth";
-import { getCompany } from "Components/actions/company";
-import { SET_AUTH, SET_PROFILE, SET_COMPANY } from "Components/actions/types";
+import { getCompany } from "Components/actions/models/company";
+import { SET_AUTH, SET_PROFILE, SET_COMPANY } from "Components/actions/types/control_types";
 var state = store.getState();
 
 class CompanyIndex extends Component {

@@ -12,9 +12,9 @@ import {
   SET_PROFILE,
   SET_COMPANIES,
   SET_JOBS
-} from "Components/actions/types";
-import { getCompanies } from "Components/actions/companies";
-import { getJobs } from "Components/actions/jobs";
+} from "Components/actions/types/control_types";
+import { getCompanies } from "Components/actions/models/companies";
+import { getJobs } from "Components/actions/models/jobs";
 import { authProcess } from "Components/actions/auth";
 import IndexPage from "Components/Index/IndexPage";
 

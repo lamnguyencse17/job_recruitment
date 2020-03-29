@@ -6,8 +6,8 @@ import { Provider } from 'react-redux';
 
 import store from 'Components/store';
 
-import { SET_PROFILE, SET_AUTH, SET_JOBS } from "Components/actions/types";
-import { getJobs } from "Components/actions/jobs";
+import { SET_PROFILE, SET_AUTH, SET_JOBS } from "Components/actions/types/control_types";
+import { getJobs } from "Components/actions/models/jobs";
 import { authProcess } from "Components/actions/auth";
 
 import Headnav from 'Components/Headnav/Headnav';

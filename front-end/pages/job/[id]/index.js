@@ -6,11 +6,11 @@ import { Provider } from 'react-redux';
 
 import store from 'Components/store';
 
-import { SET_PROFILE, SET_AUTH, SET_JOB } from "Components/actions/types";
+import { SET_PROFILE, SET_AUTH, SET_JOB } from "Components/actions/types/control_types";
 
 import Headnav from 'Components/Headnav/Headnav';
 import SingleJob from "Components/Jobs/SingleJob";
-import { getJob } from "Components/actions/job";
+import { getJob } from "Components/actions/models/job";
 import { authProcess } from "Components/actions/auth";
 
 var state = store.getState();

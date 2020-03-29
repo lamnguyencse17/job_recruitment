@@ -10,12 +10,6 @@ import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 
 class IndexPage extends Component {
-  handleVisitCompany = () => {
-    console.log(event.target.id);
-  };
-  handleVisitJob = () => {
-    console.log(event.target.id);
-  };
   render() {
     return (
       <Container>
@@ -43,8 +37,7 @@ class IndexPage extends Component {
                     <Card.Title>{company.name}</Card.Title>
                     <Card.Text>{company.description}</Card.Text>
                     <Button
-                      variant="primary"
-                      onClick={this.handleVisitCompany}
+                      variant="primary" href={`/company/${company._id}`}
                       id={company._id}
                     >
                       {company.jobs.length} Jobs Available
@@ -69,7 +62,7 @@ class IndexPage extends Component {
                     <Card.Text>{job.salary}</Card.Text>
                     <Button
                       variant="primary"
-                      onClick={this.handleVisitJob}
+                      href={`/job/${job._id}`}
                       id={job._id}
                     >
                       Learn More

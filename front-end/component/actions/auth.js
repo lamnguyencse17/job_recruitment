@@ -6,9 +6,9 @@ import {
     LOGOUT_PROCESS,
     AUTH_PROCESS,
     VERIFY_PROCESS,
-    CLEAR_ERRORS
-} from "./types";
-import { setErrors } from './errors';
+} from "./types/auth_types"
+import {CLEAR_ERRORS} from "./types/control_types"
+import { setErrors } from './control/errors';
 
 export const loginProcess = (username, password) => async (dispatch) => {
     let result = await axios

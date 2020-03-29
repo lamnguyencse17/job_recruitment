@@ -1,6 +1,6 @@
 import axios from "axios";
-import { GET_JOBS } from "./types";
-import { setErrors } from './errors';
+import { GET_JOBS } from "../types/model_types";
+import { setErrors } from '../control/errors';
 
 export const getJobs = (page) => async dispatch => {
     let result = await axios

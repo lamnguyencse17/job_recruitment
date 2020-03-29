@@ -1,19 +1,18 @@
 import axios from "axios";
-import { GET_JOB } from "./types";
-import { setErrors } from './errors';
+import { GET_COMPANIES } from "../types/model_types";
+import { setErrors } from '../control/errors';
 
-export const getJob = (id) => async dispatch => {
-    console.log(id)
+export const getCompanies = (page) => async dispatch => {
     let result = await axios
         .get(
-            `http://127.0.0.1:5000/api/jobs/${id}`,
+            `http://127.0.0.1:5000/api/companies/${page}`,
             {
                 headers: {
                     "Content-Type": "application/json",
                 },
             }
         ).then(res => {
-            dispatch({ type: GET_JOB, payload: res.data });
+            dispatch({ type: GET_COMPANIES, payload: res.data });
             return res.data;
         })
         .catch(err => {
