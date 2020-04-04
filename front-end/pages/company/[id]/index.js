@@ -35,7 +35,7 @@ class CompanyIndex extends Component {
         let authorized = await store.dispatch(authProcess(authRedux.token));
         if (authorized) {
             store.dispatch({ type: SET_AUTH, payload: authRedux });
-            if (state.profile.name == "") {
+            if (state.models.profile.name == "") {
                 profileRedux = {
                     name: localStorage.getItem("name"),
                     email: localStorage.getItem("email"),
@@ -45,7 +45,7 @@ class CompanyIndex extends Component {
                 store.dispatch({ type: SET_PROFILE, payload: profileRedux });
             }
         }
-        if (Object.entries(state.company).length === 0 && state.company.constructor === Object) {
+        if (Object.entries(state.models.company).length === 0 && state.models.company.constructor === Object) {
             store.dispatch({ type: SET_COMPANY, payload: this.props.company });
         }
     }

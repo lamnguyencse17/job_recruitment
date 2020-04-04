@@ -82,7 +82,7 @@ Jobs.propTypes = {
 
 function mapStateToProps(state) {
   return {
-    jobs: state.jobs
+    jobs: state.models.jobs
   };
 }
 

@@ -28,13 +28,13 @@ export default class Index extends Component {
   }
   static async getInitialProps() {
     let state = store.getState();
-    if (state.companies.page.length == 0) {
+    if (state.models.companies.page.length == 0 || state.models.jobs.page.length == 0) {
       return {
         company_page: await store.dispatch(getCompanies(1)),
         job_page: await store.dispatch(getJobs(1))
       };
     }
-    return { company_page: state.companies.page, job_page: state.jobs.page };
+    return { company_page: state.models.companies.page, job_page: state.models.jobs.page };
   }
 
   async componentDidMount() {

@@ -4,7 +4,7 @@ const mongo = require('mongodb').MongoClient
 const dataPath = 'mongodb+srv://zodiac3011:zodiac3011@jobrecruitment-5m9ay.azure.mongodb.net/test?retryWrites=true&w=majority'
 const errorLog = require('../../../logging/modules/errorLog')
 
-router.use((req, res) => {
+router.use('/', (req, res) => {
     mongo.connect(dataPath, async (err, client) => {
         if (err) {
             errorLog.writeLog(req.baseUrl, req.path, req.method, req.body, err)
@@ -22,10 +22,9 @@ router.use((req, res) => {
 })
 
 async function queryTerm(client, term, collections) {
-    console.log(collections)
     let result = {}
     collections.map(async (collection) => {
-        result[`${collection}`] = await client.db("job_recruitment").collection(collection).find({ $or: [{ "name": { $regex: term } }, { "description": { $regex: term } }] }).toArray()
+        result[`${collection}`] = await client.db("job_recruitment").collection(`${collection}`).find({ $or: [{ "name": { $regex: term } }, { "description": { $regex: term } }] }).toArray()
     })
     return result
 }

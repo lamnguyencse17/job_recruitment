@@ -19,7 +19,7 @@ class JobIndex extends Component {
     static async getInitialProps(router) {
         let id = router.query.id;
         console.log(id);
-        if (state.jobs.page.length == 0) {
+        if (state.models.jobs.page.length == 0) {
             return { job: await store.dispatch(getJob(id)) };
         }
         return {};
@@ -38,7 +38,7 @@ class JobIndex extends Component {
         let authorized = await store.dispatch(authProcess(authRedux.token));
         if (authorized) {
             store.dispatch({ type: SET_AUTH, payload: authRedux });
-            if (state.profile.name == "") {
+            if (state.models.profile.name == "") {
                 profileRedux = {
                     name: localStorage.getItem("name"),
                     email: localStorage.getItem("email"),
@@ -48,7 +48,7 @@ class JobIndex extends Component {
                 store.dispatch({ type: SET_PROFILE, payload: profileRedux });
             }
         }
-        if (Object.entries(state.job).length === 0 && state.job.constructor === Object) {
+        if (Object.entries(state.models.job).length === 0 && state.models.job.constructor === Object) {
             store.dispatch({ type: SET_JOB, payload: this.props.job });
         }
     }

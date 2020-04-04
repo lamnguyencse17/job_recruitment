@@ -4,6 +4,8 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import {bindActionCreators} from "redux";
 
+import {searchProcess} from "Components/actions/control/search"
+
 
 import {connect} from 'react-redux';
 import PropTypes from "prop-types";
@@ -19,7 +21,7 @@ class SearchBar extends Component {
     this.setState({ [e.target.name]: e.target.value });
   }
   handleSearch(){
-    console.log("SEARCH")
+    this.props.searchProcess(this.state.term)
   }
   render() {
     return (
@@ -31,4 +33,12 @@ class SearchBar extends Component {
   }
 }
 
-export default SearchBar;
+SearchBar.propTypes = {
+  searchProcess: PropTypes.func.isRequired
+}
+
+function mapDispatchToProps(dispatch){
+  return bindActionCreators({searchProcess}, dispatch);
+}
+
+export default connect(null, mapDispatchToProps)(SearchBar);

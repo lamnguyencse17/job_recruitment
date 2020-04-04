@@ -113,7 +113,7 @@ RegisterModal.propTypes = {
 
 function mapStateToProps(state) {
   return {
-    popup: state.errors.show
+    popup: state.control.errors.show
   };
 }
 

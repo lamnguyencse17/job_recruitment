@@ -18,7 +18,7 @@ export class Popup extends Component {
 }
 
 const mapStateToProps = state => ({
-    error: state.errors,
+    error: state.control.errors,
 });
 
 export default connect(mapStateToProps, null)(Popup);

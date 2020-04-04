@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { bindActionCreators } from "redux";
-import { getProfile } from "../actions/profile";
+import { getProfile } from "../actions/models/profile";
 import { authProcess } from "../actions/auth";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
@@ -98,7 +98,7 @@ Profile.propTypes = {
 function mapStateToProps(state) {
   return {
     id: state.auth.id,
-    email: state.profile.email,
+    email: state.models.profile.email,
     token: state.auth.token,
     username: state.auth.username
   };

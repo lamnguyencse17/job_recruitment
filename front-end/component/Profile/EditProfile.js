@@ -141,9 +141,9 @@ EditProfile.propTypes = {
 
 function mapStateToProps(state) {
   return {
-    email: state.profile.email,
-    name: state.profile.name,
-    dob: state.profile.dob,
+    email: state.models.profile.email,
+    name: state.models.profile.name,
+    dob: state.models.profile.dob,
     token: state.auth.token
   };
 }

@@ -67,7 +67,7 @@ Companies.propTypes = {
 
 function mapStateToProps(state) {
   return {
-    companies: state.companies
+    companies: state.models.companies
   };
 }
 

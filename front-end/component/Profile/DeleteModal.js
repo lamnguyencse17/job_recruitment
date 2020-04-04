@@ -91,7 +91,7 @@ DeleteModal.propTypes = {
 function mapStateToProps(state) {
   return {
     token: state.auth.token,
-    popup: state.errors.show
+    popup: state.control.errors.show
   };
 }
 

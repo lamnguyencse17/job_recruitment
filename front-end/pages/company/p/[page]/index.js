@@ -16,7 +16,7 @@ import Companies from "Components/Companies/Companies";
 var state = store.getState();
 export default class CompaniesIndex extends Component {
     static async getInitialProps() {
-        if (state.companies.page.length == 0) {
+        if (state.models.companies.page.length == 0) {
             return { page: await store.dispatch(getCompanies(1)) };
         }
         return {};
@@ -35,7 +35,7 @@ export default class CompaniesIndex extends Component {
         let authorized = await store.dispatch(authProcess(authRedux.token));
         if (authorized) {
             store.dispatch({ type: SET_AUTH, payload: authRedux });
-            if (state.profile.name == "") {
+            if (state.models.profile.name == "") {
                 profileRedux = {
                     name: localStorage.getItem("name"),
                     email: localStorage.getItem("email"),
@@ -45,7 +45,7 @@ export default class CompaniesIndex extends Component {
                 store.dispatch({ type: SET_PROFILE, payload: profileRedux });
             }
         }
-        if (state.companies.page.length == 0) {
+        if (state.models.companies.page.length == 0) {
             store.dispatch({ type: SET_COMPANIES, payload: this.props.page });
         }
     }
